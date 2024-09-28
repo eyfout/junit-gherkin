@@ -9,8 +9,8 @@ public abstract class HttpAPI<B> {
 
     abstract public String getDescription();
 
-    public <B extends HttpAPIExecutor> B executor(HttpAPIBuilder builder, GivenState givenState) {
-        return (B) new HttpAPIExecutor(this, builder, givenState);
+    public <B extends HttpAPIRequestExecutor> B executor(HttpAPIRequestBuilder builder, GivenState givenState) {
+        return (B) new HttpAPIRequestExecutor(this, builder, givenState);
     }
 
     @Override

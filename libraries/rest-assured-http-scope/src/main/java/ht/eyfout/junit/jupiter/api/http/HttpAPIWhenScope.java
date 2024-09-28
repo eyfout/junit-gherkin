@@ -8,13 +8,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class HttpAPIWhenScope extends WhenScope {
-    protected List<Map.Entry<HttpAPI[], HttpAPIBuilder>> httpRequests = new ArrayList<>();
+    protected List<Map.Entry<HttpAPI[], HttpAPIRequestBuilder>> httpRequests = new ArrayList<>();
 
-    public HttpAPIBuilder request(HttpAPI... api) {
+    public HttpAPIRequestBuilder request(HttpAPI... api) {
         if (api.length == 0) {
             throw new IllegalArgumentException("at least one Http API is required.");
         }
-        HttpAPIBuilder builder = new HttpAPIBuilder();
+        HttpAPIRequestBuilder builder = new HttpAPIRequestBuilder();
         httpRequests.add(new AbstractMap.SimpleEntry(api, builder));
         return builder;
     }

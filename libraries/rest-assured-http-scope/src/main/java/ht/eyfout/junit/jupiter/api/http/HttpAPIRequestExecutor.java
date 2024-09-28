@@ -12,13 +12,13 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-final public class HttpAPIExecutor implements WhenScopeExecutor {
+final public class HttpAPIRequestExecutor implements WhenScopeExecutor {
     private final HttpAPI api;
-    private final HttpAPIBuilder builder;
+    private final HttpAPIRequestBuilder builder;
     private final GivenState givenState;
     private Response httpResponse;
 
-    HttpAPIExecutor(HttpAPI api, HttpAPIBuilder builder, GivenState givenState) {
+    HttpAPIRequestExecutor(HttpAPI api, HttpAPIRequestBuilder builder, GivenState givenState) {
         this.api = api;
         this.builder = builder;
         this.givenState = givenState;
