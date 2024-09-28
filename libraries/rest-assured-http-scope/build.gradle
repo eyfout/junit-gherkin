@@ -1,0 +1,15 @@
+plugins {
+    id("java")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    implementation project(":libraries:core")
+    implementation 'io.rest-assured:rest-assured:5.5.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
