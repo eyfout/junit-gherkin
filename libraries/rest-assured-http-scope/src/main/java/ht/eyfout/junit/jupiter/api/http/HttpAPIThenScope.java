@@ -5,10 +5,11 @@ import ht.eyfout.junit.jupiter.api.WhenScopeExecutor;
 import io.restassured.response.Response;
 
 public class HttpAPIThenScope extends ThenScope {
-    HttpAPIThenScope(WhenScopeExecutor executor){
+    HttpAPIThenScope(WhenScopeExecutor executor) {
         super(executor);
     }
-    public Response httpResponse(){
+
+    public Response httpResponse() {
         return exec();
     }
 }

@@ -11,6 +11,9 @@ public class HttpAPIWhenScope extends WhenScope {
     protected List<Map.Entry<HttpAPI[], HttpAPIBuilder>> httpRequests = new ArrayList<>();
 
     public HttpAPIBuilder request(HttpAPI... api) {
+        if (api.length == 0) {
+            throw new IllegalArgumentException("at least one Http API is required.");
+        }
         HttpAPIBuilder builder = new HttpAPIBuilder();
         httpRequests.add(new AbstractMap.SimpleEntry(api, builder));
         return builder;
@@ -19,7 +22,7 @@ public class HttpAPIWhenScope extends WhenScope {
     @Override
     public Stream<WhenScopeExecutor> scopeExecutor(GivenState given) {
         return httpRequests.stream().flatMap(requests ->
-                Arrays.stream(requests.getKey()).map(api -> new HttpAPIExecutor(api, requests.getValue(), given))
+                Arrays.stream(requests.getKey()).map(api -> api.executor(requests.getValue(), given))
         );
     }
 }

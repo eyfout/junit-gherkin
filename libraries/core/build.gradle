@@ -5,7 +5,6 @@ plugins {
 repositories {
     mavenCentral()
 }
-project.name = 'junit-gherkin'
 dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 }

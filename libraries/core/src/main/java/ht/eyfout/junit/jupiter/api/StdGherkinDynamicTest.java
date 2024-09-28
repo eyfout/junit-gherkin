@@ -45,8 +45,17 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
 
         @Override
         public Stream<DynamicTest> then(String label, Consumer<T> then) {
-            whenScopes.stream().flatMap(whenScope -> whenScope.scopeExecutor(givenState.copyWith()));
-            return null;
+
+            return whenScopes.stream()
+                    .flatMap(whenScope -> {
+                        return whenScope.scopeExecutor(givenState.copyWith()).map(executor ->{
+                            T thenScope = provider.thenScope(executor);
+                            return DynamicTest.dynamicTest(givenState.getLabel().get(), () ->{
+                                then.accept(thenScope);
+                            });
+                        });
+                    });
+
         }
     }
 

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class GivenState implements MutableScope {
+public abstract class GivenState implements MutableScope {
     private final Map<Object, Object> miscellaneous;
     public GivenState(){
         miscellaneous = new HashMap<>();
@@ -18,13 +18,13 @@ public class GivenState implements MutableScope {
         miscellaneous.put(GivenState.class, label);
     }
 
-    public GivenState copy() {
-        return new GivenState();
-    }
+    public abstract GivenState copy();
 
     final GivenState copyWith() {
         GivenState other = copy();
         other.miscellaneous.putAll(miscellaneous);
         return other;
     }
+
+    abstract public Map<String, Object> asMap();
 }

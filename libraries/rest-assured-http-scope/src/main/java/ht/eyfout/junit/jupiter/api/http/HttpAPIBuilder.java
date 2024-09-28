@@ -3,7 +3,7 @@ package ht.eyfout.junit.jupiter.api.http;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class HttpAPIBuilder {
+public class HttpAPIBuilder {
     Map<String, Object> headers = new HashMap<>();
     Map<String, Object> queryParams = new HashMap<>();
     Map<String, Object> pathParams = new HashMap<>();
