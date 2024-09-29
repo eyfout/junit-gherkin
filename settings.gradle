@@ -1,3 +1,6 @@
 
-include(":libraries:core")
-include(":libraries:rest-assured-http-scope")
+include(":libraries:junit-gherkin")
+include(":libraries:rest-assured-http-scopes")
+//include(":libraries:micronaut-client-generator")
+
+//include(":examples:micronaut-app")
