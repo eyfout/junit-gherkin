@@ -7,9 +7,9 @@ import ht.eyfout.junit.jupiter.api.http.HttpAPIWhenScope
 import jakarta.inject.Singleton
 
 @Singleton
-class ExampleStateScopeProvider(val client: DMVClient) :
-    HttpAPIStateScopeProvider<ExampleGivenState, HttpAPIWhenScope, HttpAPIThenScope>() {
-    override fun givenState(): ExampleGivenState {
-        return ExampleGivenState(client = client)
+class ExampleStateScopeProvider(private val client: DMVClient) :
+    HttpAPIStateScopeProvider<ClientGivenState, HttpAPIWhenScope, HttpAPIThenScope>() {
+    override fun givenState(): ClientGivenState {
+        return ClientGivenState(client = client)
     }
 }

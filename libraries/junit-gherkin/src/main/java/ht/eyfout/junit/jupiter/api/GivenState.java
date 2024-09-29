@@ -6,7 +6,8 @@ import java.util.Optional;
 
 public abstract class GivenState implements MutableScope {
     private final Map<Object, Object> miscellaneous;
-    public GivenState(){
+
+    public GivenState() {
         miscellaneous = new HashMap<>();
     }
 
@@ -20,10 +21,11 @@ public abstract class GivenState implements MutableScope {
 
     public abstract GivenState copy();
 
-    final GivenState copyWith() {
+    @SuppressWarnings("unchecked")
+    final <G extends GivenState> G copyWith() {
         GivenState other = copy();
         other.miscellaneous.putAll(miscellaneous);
-        return other;
+        return (G)other;
     }
 
     abstract public Map<String, Object> asMap();

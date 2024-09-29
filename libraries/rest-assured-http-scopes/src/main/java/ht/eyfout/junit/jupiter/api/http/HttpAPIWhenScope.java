@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 public class HttpAPIWhenScope extends WhenScope {
     final protected List<Map.Entry<HttpAPI[], HttpAPIRequestBuilder>> httpRequests = new ArrayList<>();
     protected GivenState givenState;
-    public HttpAPIWhenScope(GivenState givenState){
+
+    public HttpAPIWhenScope(GivenState givenState) {
         this.givenState = givenState;
     }
 
@@ -19,7 +20,7 @@ public class HttpAPIWhenScope extends WhenScope {
             throw new IllegalArgumentException("at least one Http API is required.");
         }
         HttpAPIRequestBuilder builder = new HttpAPIRequestBuilder();
-        httpRequests.add(new AbstractMap.SimpleEntry(api, builder));
+        httpRequests.add(new AbstractMap.SimpleEntry<>(api, builder));
         return builder;
     }
 

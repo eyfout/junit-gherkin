@@ -7,31 +7,31 @@ import ht.eyfout.junit.jupiter.api.GivenState
 import io.micronaut.http.HttpResponse
 import io.mockk.every
 
-data class ExampleGivenState(
+data class ClientGivenState(
     private val state: MutableMap<String, Any> = mutableMapOf(),
     val client: DMVClient
 ) : GivenState() {
     fun GETVehiclesAnswer(
-        authorization: String,
-        manufacturerID: String,
+        authorization: String?,
+        manufacturerID: String?,
         vehicles: () -> HttpResponse<Collection<Vehicle>>
     ) {
         every {
-            client.vehicles(authorization, manufacturerID)
+            client.vehicles(authorization ?: any(), manufacturerID ?: any())
         } returns vehicles.invoke()
     }
 
     fun GETManufacturerAnswer(
-        authorization: String,
+        authorization: String?,
         manufacturers: () -> HttpResponse<Collection<VehicleManufacturer>>
     ) {
         every {
-            client.carManufacturers(authorization)
+            client.carManufacturers(authorization ?: any())
         } returns manufacturers.invoke()
     }
 
-    override fun copy(): ExampleGivenState {
-        return ExampleGivenState(state.toMutableMap(), client)
+    override fun copy(): ClientGivenState {
+        return ClientGivenState(state.toMutableMap(), client)
     }
 
     override fun asMap(): MutableMap<String, Any> {

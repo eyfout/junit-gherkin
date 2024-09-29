@@ -2,12 +2,13 @@ package ht.eyfout.junit.jupiter.api.http;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpAPIRequestBuilder {
     Map<String, Object> headers = new HashMap<>();
     Map<String, Object> queryParams = new HashMap<>();
     Map<String, Object> pathParams = new HashMap<>();
-    Object body;
+    Optional<Object> body = Optional.empty();
 
     public HttpAPIRequestBuilder header(String key, String value) {
         headers.put(key, value);
@@ -25,7 +26,7 @@ public class HttpAPIRequestBuilder {
     }
 
     public HttpAPIRequestBuilder body(Object body) {
-        this.body = body;
+        this.body = Optional.ofNullable(body);
         return this;
     }
 }

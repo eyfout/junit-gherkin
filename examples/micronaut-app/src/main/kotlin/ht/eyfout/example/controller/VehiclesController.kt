@@ -2,9 +2,11 @@ package ht.eyfout.example.controller
 
 import ht.eyfout.example.client.DMVClient
 import ht.eyfout.example.client.Vehicle
+import ht.eyfout.example.client.VehicleManufacturer
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
-import java.util.stream.Stream
 
 @Controller("v1/")
 class VehiclesController(private val dmvClient: DMVClient) {
@@ -14,20 +16,43 @@ class VehiclesController(private val dmvClient: DMVClient) {
     suspend fun vehicles(
         @Header("Authorization") authorization: String,
         @QueryValue("make") make: String
-    ): Collection<Vehicle> {
-        return dmvClient.carManufacturers(authorization).body().stream().filter {
-            it.name == make
-        }.flatMap {
-            dmvClient.vehicles(authorization, it.id).body().stream()
-        }.toList()
+    ): HttpResponse<Collection<Vehicle>> {
+        val httpResponse = dmvClient.carManufacturers(authorization)
+        return when (httpResponse.code()) {
+            HttpStatus.OK.code -> HttpResponse.ok(httpResponse.body().stream().filter {
+                it.name == make
+            }.flatMap {
+                dmvClient.vehicles(authorization, it.id).body().stream()
+            }.toList())
+
+            else -> httpResponse as HttpResponse<Collection<Vehicle>>
+        }
     }
 
-    @Get("manufacturer/{manufacturerID}/vehicles")
+    @Get("manufacturers/{manufacturerID}/vehicles")
     @Produces(MediaType.APPLICATION_JSON)
     suspend fun vehiclesByManufacturer(
         @Header("Authorization") authorization: String,
         @PathVariable("manufacturerID") manufacturerID: String
-    ): Collection<Vehicle> {
-        return dmvClient.vehicles(authorization, manufacturerID).body()
+    ): HttpResponse<Collection<Vehicle>> {
+        val httpResponse = dmvClient.vehicles(authorization, manufacturerID);
+        return when (httpResponse.code()) {
+            HttpStatus.OK.code -> HttpResponse.ok(httpResponse.body())
+            else -> httpResponse
+        }
     }
+
+
+    @Get("manufacturers")
+    @Produces(MediaType.APPLICATION_JSON)
+    suspend fun manufacturers(
+        @Header("Authorization") authorization: String,
+    ): HttpResponse<Collection<VehicleManufacturer>> {
+        val httpResponse = dmvClient.carManufacturers(authorization)
+        return when (httpResponse.code()) {
+            HttpStatus.OK.code -> HttpResponse.ok(httpResponse.body())
+            else -> httpResponse
+        }
+    }
+
 }

@@ -15,8 +15,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
 }
 
-test{
-    useJUnitPlatform{
+test {
+    useJUnitPlatform {
         includeEngines("junit-jupiter")
     }
 }

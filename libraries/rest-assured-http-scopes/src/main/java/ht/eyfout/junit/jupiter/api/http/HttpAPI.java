@@ -2,14 +2,17 @@ package ht.eyfout.junit.jupiter.api.http;
 
 import ht.eyfout.junit.jupiter.api.GivenState;
 
-public interface  HttpAPI<B> {
+import java.util.Optional;
+
+public interface HttpAPI {
     String getHttpMethod();
 
     String getBasePath();
 
-    String getDescription();
+    Optional<String> getDescription();
 
-    default  <B extends HttpAPIRequestExecutor> B executor(HttpAPIRequestBuilder builder, GivenState givenState) {
+    @SuppressWarnings("unchecked")
+    default <B extends HttpAPIRequestExecutor> B executor(HttpAPIRequestBuilder builder, GivenState givenState) {
         return (B) new HttpAPIRequestExecutor(this, builder, givenState);
     }
 }

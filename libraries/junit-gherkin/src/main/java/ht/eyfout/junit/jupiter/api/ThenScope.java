@@ -1,22 +1,10 @@
 package ht.eyfout.junit.jupiter.api;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 public abstract class ThenScope implements ImmutableScope, WhenScopeExecutor {
     protected final WhenScopeExecutor executor;
-    public ThenScope(WhenScopeExecutor executor){
+
+    public ThenScope(WhenScopeExecutor executor) {
         this.executor = executor;
-    }
-    Map<Object, Object> miscellaneous = new HashMap<>();
-
-    final Optional<String> getLabel() {
-        return Optional.ofNullable((String) miscellaneous.get(ThenScope.class));
-    }
-
-    final void setLabel(String label) {
-        miscellaneous.put(ThenScope.class, label);
     }
 
     @Override
