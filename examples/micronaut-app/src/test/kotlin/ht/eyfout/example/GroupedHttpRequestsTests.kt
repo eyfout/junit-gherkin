@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestFactory
 
 @MicronautTest
-class GroupedWhenTests {
+class GroupedHttpRequestsTests {
 
     @MockBean(DMVClient::class)
     val dmvClient: DMVClient = mockk()
