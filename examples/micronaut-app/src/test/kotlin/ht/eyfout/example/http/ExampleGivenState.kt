@@ -11,14 +11,20 @@ data class ExampleGivenState(
     private val state: MutableMap<String, Any> = mutableMapOf(),
     val client: DMVClient
 ) : GivenState() {
-
-    fun GETVehiclesAnswer(authorization: String, manufacturerID: String, vehicles: () -> HttpResponse<Collection<Vehicle>>) {
+    fun GETVehiclesAnswer(
+        authorization: String,
+        manufacturerID: String,
+        vehicles: () -> HttpResponse<Collection<Vehicle>>
+    ) {
         every {
             client.vehicles(authorization, manufacturerID)
         } returns vehicles.invoke()
     }
 
-    fun GETManufacturerAnswer(authorization: String, manufacturers: () -> HttpResponse<Collection<VehicleManufacturer>>) {
+    fun GETManufacturerAnswer(
+        authorization: String,
+        manufacturers: () -> HttpResponse<Collection<VehicleManufacturer>>
+    ) {
         every {
             client.carManufacturers(authorization)
         } returns manufacturers.invoke()

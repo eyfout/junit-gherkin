@@ -3,12 +3,11 @@ package ht.eyfout.example
 import ht.eyfout.example.client.DMVClient
 import ht.eyfout.example.client.Vehicle
 import ht.eyfout.example.client.VehicleManufacturer
-import ht.eyfout.example.http.ExampleHttpAPI
 import ht.eyfout.example.http.ExampleStateScopeProvider
+import ht.eyfout.example.http.ServiceAPI
 import ht.eyfout.junit.jupiter.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.mockk.mockk
@@ -20,6 +19,7 @@ import org.junit.jupiter.api.TestFactory
 class ExampleTests {
     @MockBean(DMVClient::class)
     fun dmvClient(): DMVClient = mockk()
+
     @Inject
     lateinit var provider: ExampleStateScopeProvider
 
@@ -28,27 +28,35 @@ class ExampleTests {
         .given("an inventory of vehicles by manufacturer") {
             it.GETVehiclesAnswer(
                 authorization = "eyfout",
-                manufacturerID = "Nissan-#1") {
-                HttpResponse.ok(listOf(
-                    Vehicle("Vehicle#1", "Nissan-#1", "Maxima"),
-                    Vehicle("Vehicle#1", "Nissan-#1", "Altima")
-                ))
+                manufacturerID = "Nissan-#1"
+            ) {
+                HttpResponse.ok(
+                    listOf(
+                        Vehicle("Vehicle#1", "Nissan-#1", "Maxima"),
+                        Vehicle("Vehicle#1", "Nissan-#1", "Altima")
+                    )
+                )
             }
 
             it.GETManufacturerAnswer(authorization = "eyfout") {
-                HttpResponse.ok(listOf(
-                    VehicleManufacturer("Nissan-#1", "Nissan", "1968"),
-                    VehicleManufacturer("Ford-#2", "Ford", "1955"),
-                    VehicleManufacturer("Subaru-#3", "Subaru", "1934")
-                ))
+                HttpResponse.ok(
+                    listOf(
+                        VehicleManufacturer("Nissan-#1", "Nissan", "1968"),
+                        VehicleManufacturer("Ford-#2", "Ford", "1955"),
+                        VehicleManufacturer("Subaru-#3", "Subaru", "1934")
+                    )
+                )
             }
 
-        }.`when`("GET Nissan vehicles") {
-            it.httpRequest(ExampleHttpAPI.INSTANCE)
+        }.`when`("GET by manufacturer name") {
+            it.httpRequest(ServiceAPI.VehiclesByManufacturerName)
                 .queryParam("make", "Nissan")
                 .header("Authorization", "eyfout")
+        }.`when`("GET by manufacturer ID"){
+            it.httpRequest(ServiceAPI.VehiclesByManufacturerID)
+                .header("Authorization", "eyfout")
+                .pathParam("manufacturerID", "Nissan-#1")
         }.then("Altima and Maxima") {
-
             assertEquals(HttpStatus.OK.code, it.httpResponse().statusCode())
             val vehicles = it.httpResponse().body().`as`(Array<Vehicle>::class.java)
             assertEquals(2, vehicles.size);

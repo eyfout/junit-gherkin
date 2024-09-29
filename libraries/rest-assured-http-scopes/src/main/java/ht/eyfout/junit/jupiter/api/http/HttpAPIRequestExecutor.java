@@ -10,6 +10,7 @@ import java.net.ConnectException;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 final public class HttpAPIRequestExecutor implements WhenScopeExecutor {
@@ -33,6 +34,19 @@ final public class HttpAPIRequestExecutor implements WhenScopeExecutor {
                 .map(it -> new AbstractMap.SimpleEntry<String, Object>(it, given.get(it)))
                 .filter(it -> it.getValue() != null)
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+    }
+
+    @Override
+    public Optional<String> displayName() {
+
+        String queryParams = "?";
+        if(!builder.queryParams.isEmpty()){
+             queryParams += builder.queryParams.entrySet().stream()
+                     .map(it -> it.getKey() + "="+it.getValue())
+                     .collect(Collectors.joining("&"));
+        }
+
+        return Optional.of(api.getHttpMethod().toUpperCase() + " " + api.getBasePath() + queryParams);
     }
 
     @Override

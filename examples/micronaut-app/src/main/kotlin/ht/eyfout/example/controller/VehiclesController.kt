@@ -14,7 +14,7 @@ class VehiclesController(private val dmvClient: DMVClient) {
     suspend fun vehicles(
         @Header("Authorization") authorization: String,
         @QueryValue("make") make: String
-    ): List<Vehicle> {
+    ): Collection<Vehicle> {
         return dmvClient.carManufacturers(authorization).body().stream().filter {
             it.name == make
         }.flatMap {
@@ -22,5 +22,12 @@ class VehiclesController(private val dmvClient: DMVClient) {
         }.toList()
     }
 
-
+    @Get("manufacturer/{manufacturerID}/vehicles")
+    @Produces(MediaType.APPLICATION_JSON)
+    suspend fun vehiclesByManufacturer(
+        @Header("Authorization") authorization: String,
+        @PathVariable("manufacturerID") manufacturerID: String
+    ): Collection<Vehicle> {
+        return dmvClient.vehicles(authorization, manufacturerID).body()
+    }
 }
