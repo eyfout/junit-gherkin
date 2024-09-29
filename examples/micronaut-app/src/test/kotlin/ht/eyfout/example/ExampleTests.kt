@@ -17,6 +17,7 @@ import org.junit.jupiter.api.TestFactory
 
 @MicronautTest
 class ExampleTests {
+
     @MockBean(DMVClient::class)
     fun dmvClient(): DMVClient = mockk()
 
@@ -32,8 +33,8 @@ class ExampleTests {
             ) {
                 HttpResponse.ok(
                     listOf(
-                        Vehicle("Vehicle#1", "Nissan-#1", "Maxima"),
-                        Vehicle("Vehicle#1", "Nissan-#1", "Altima")
+                        Vehicle(id = "Vehicle#1", manufacturer = "Nissan-#1", model = "Maxima"),
+                        Vehicle(id = "Vehicle#1", manufacturer = "Nissan-#1", model = "Altima")
                     )
                 )
             }
@@ -41,25 +42,67 @@ class ExampleTests {
             it.GETManufacturerAnswer(authorization = "eyfout") {
                 HttpResponse.ok(
                     listOf(
-                        VehicleManufacturer("Nissan-#1", "Nissan", "1968"),
-                        VehicleManufacturer("Ford-#2", "Ford", "1955"),
-                        VehicleManufacturer("Subaru-#3", "Subaru", "1934")
+                        VehicleManufacturer(id = "Nissan-#1", name = "Nissan", established = "1968"),
+                        VehicleManufacturer(id = "Ford-#2", name = "Ford", established = "1955"),
+                        VehicleManufacturer(id = "Subaru-#3", name = "Subaru", established = "1934")
                     )
                 )
             }
 
-        }.`when`("GET by manufacturer name") {
+        }.fork(
+            {
+                it.`when`("GET by manufacturer name") {
+                    it.httpRequest(ServiceAPI.VehiclesByManufacturerName)
+                        .queryParam("make", "Nissan")
+                        .header("Authorization", "eyfout")
+                }.`when`("GET by manufacturer ID") {
+                    it.httpRequest(ServiceAPI.VehiclesByManufacturerID)
+                        .header("Authorization", "eyfout")
+                        .pathParam("manufacturerID", "Nissan-#1")
+                }.then("Altima and Maxima") {
+                    assertEquals(HttpStatus.OK.code, it.httpResponse().statusCode())
+                    val vehicles = it.httpResponse().body().`as`(Array<Vehicle>::class.java)
+                    assertEquals(2, vehicles.size);
+                    assertEquals(setOf("Maxima", "Altima"), vehicles.map { it.model }.toSet())
+                }
+            },
+            {
+                it.`when`("GET all manufacturers") {
+                    it.httpRequest(ServiceAPI.Manufacturers)
+                        .header("Authorization", "eyfout")
+                }.then("Nissan, Ford, Subaru") {
+                    assertEquals(HttpStatus.OK.code, it.httpResponse().statusCode())
+                    val manufacturers = it.httpResponse().body().`as`(Array<VehicleManufacturer>::class.java)
+                    assertEquals(3, manufacturers.size)
+                    assertEquals(
+                        setOf("Nissan", "Ford", "Subaru"),
+                        manufacturers.map(VehicleManufacturer::name).toSet()
+                    )
+                }
+            },
+        )
+
+    @TestFactory
+    fun unauthorized() = GherkinDynamicTest.dynamicTest(provider)
+        .given("an unauthorized request") {
+            it.GETManufacturerAnswer(null) {
+                HttpResponse.unauthorized()
+            }
+            it.GETVehiclesAnswer(null, null) {
+                HttpResponse.unauthorized()
+            }
+        }.`when`("calling service api") {
             it.httpRequest(ServiceAPI.VehiclesByManufacturerName)
                 .queryParam("make", "Nissan")
-                .header("Authorization", "eyfout")
-        }.`when`("GET by manufacturer ID"){
+                .header("Authorization", "other")
+
             it.httpRequest(ServiceAPI.VehiclesByManufacturerID)
-                .header("Authorization", "eyfout")
+                .header("Authorization", "other")
                 .pathParam("manufacturerID", "Nissan-#1")
-        }.then("Altima and Maxima") {
-            assertEquals(HttpStatus.OK.code, it.httpResponse().statusCode())
-            val vehicles = it.httpResponse().body().`as`(Array<Vehicle>::class.java)
-            assertEquals(2, vehicles.size);
-            assertEquals(setOf("Maxima", "Altima"), vehicles.map { it.model }.toSet())
+
+            it.httpRequest(ServiceAPI.Manufacturers)
+                .header("Authorization", "other")
+        }.then("Http 401") {
+            assertEquals(HttpStatus.UNAUTHORIZED.code, it.httpResponse().statusCode())
         }
 }

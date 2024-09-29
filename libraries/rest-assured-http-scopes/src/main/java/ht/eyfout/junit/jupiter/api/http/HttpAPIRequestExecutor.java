@@ -5,6 +5,7 @@ import ht.eyfout.junit.jupiter.api.WhenScopeExecutor;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import java.net.ConnectException;
 import java.util.AbstractMap;
@@ -40,10 +41,10 @@ final public class HttpAPIRequestExecutor implements WhenScopeExecutor {
     public Optional<String> displayName() {
 
         String queryParams = "?";
-        if(!builder.queryParams.isEmpty()){
-             queryParams += builder.queryParams.entrySet().stream()
-                     .map(it -> it.getKey() + "="+it.getValue())
-                     .collect(Collectors.joining("&"));
+        if (!builder.queryParams.isEmpty()) {
+            queryParams += builder.queryParams.entrySet().stream()
+                    .map(it -> it.getKey() + "=" + it.getValue())
+                    .collect(Collectors.joining("&"));
         }
 
         return Optional.of(api.getHttpMethod().toUpperCase() + " " + api.getBasePath() + queryParams);
@@ -55,12 +56,13 @@ final public class HttpAPIRequestExecutor implements WhenScopeExecutor {
             Map<String, Object> pathParams = pathParams();
             pathParams.putAll(builder.pathParams);
             try {
-                httpResponse = RestAssured.given()
+                RequestSpecification spec = RestAssured.given()
                         .basePath(api.getBasePath())
                         .headers(builder.headers)
                         .queryParams(builder.queryParams)
-                        .pathParams(pathParams)
-                        .request(Method.valueOf(api.getHttpMethod().toUpperCase()));
+                        .pathParams(pathParams);
+                builder.body.ifPresent(spec::body);
+                httpResponse = spec.request(Method.valueOf(api.getHttpMethod().toUpperCase()));
             } catch (Throwable e) {
                 if (e instanceof ConnectException) {
                     throw new IllegalStateException("Unable to connect to " + api.toString(), e);

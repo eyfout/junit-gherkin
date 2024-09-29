@@ -6,7 +6,8 @@ import java.util.Optional;
 
 public abstract class GivenState implements MutableScope {
     private final Map<Object, Object> miscellaneous;
-    public GivenState(){
+
+    public GivenState() {
         miscellaneous = new HashMap<>();
     }
 

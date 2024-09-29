@@ -3,9 +3,11 @@ package ht.eyfout.junit.jupiter.api;
 import org.junit.jupiter.api.DynamicTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T extends ThenScope> implements GherkinDynamicTest<G, W, T> {
@@ -36,6 +38,13 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         }
 
         @Override
+        public Stream<DynamicTest> fork(Function<FollowOn<W, T>, Stream<DynamicTest>>... fork) {
+            return Arrays.stream(fork).flatMap(it ->
+                    it.apply(new StdFollowOn(provider, this.givenState.copyWith()))
+            );
+        }
+
+        @Override
         public FollowOn when(String label, Consumer<W> when) {
             W whenScope = provider.whenScope((G) givenState.copyWith());
             when.accept(whenScope);
@@ -44,7 +53,7 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
             return this;
         }
 
-        private String displayName(WhenScope whenScope, String thenLabel, Optional<String> addOn){
+        private String displayName(WhenScope whenScope, String thenLabel, Optional<String> addOn) {
             StringBuilder sb = new StringBuilder();
             String delimiter = " | ";
             givenState.getLabel().ifPresent(it -> sb.append("Given: ").append(it).append(delimiter));
@@ -58,9 +67,9 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         public Stream<DynamicTest> then(String label, Consumer<T> then) {
             return whenScopes.stream()
                     .flatMap(whenScope -> {
-                        return whenScope.scopeExecutor(givenState.copyWith()).map(executor ->{
+                        return whenScope.scopeExecutor(givenState.copyWith()).map(executor -> {
                             T thenScope = provider.thenScope(executor);
-                            return DynamicTest.dynamicTest(displayName(whenScope, label, executor.displayName()), () ->{
+                            return DynamicTest.dynamicTest(displayName(whenScope, label, executor.displayName()), () -> {
                                 then.accept(thenScope);
                             });
                         });

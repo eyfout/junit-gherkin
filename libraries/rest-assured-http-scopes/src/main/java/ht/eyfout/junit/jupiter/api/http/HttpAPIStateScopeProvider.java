@@ -11,11 +11,11 @@ public abstract class HttpAPIStateScopeProvider<Given extends GivenState, When e
 
     @Override
     public When whenScope(Given givenState) {
-        return (When)new HttpAPIWhenScope(givenState);
+        return (When) new HttpAPIWhenScope(givenState);
     }
 
     @Override
     public Then thenScope(WhenScopeExecutor executor) {
-        return (Then)new HttpAPIThenScope(executor);
+        return (Then) new HttpAPIThenScope(executor);
     }
 }

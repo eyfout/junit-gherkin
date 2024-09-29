@@ -12,21 +12,21 @@ data class ExampleGivenState(
     val client: DMVClient
 ) : GivenState() {
     fun GETVehiclesAnswer(
-        authorization: String,
-        manufacturerID: String,
+        authorization: String?,
+        manufacturerID: String?,
         vehicles: () -> HttpResponse<Collection<Vehicle>>
     ) {
         every {
-            client.vehicles(authorization, manufacturerID)
+            client.vehicles(authorization ?: any(), manufacturerID ?: any())
         } returns vehicles.invoke()
     }
 
     fun GETManufacturerAnswer(
-        authorization: String,
+        authorization: String?,
         manufacturers: () -> HttpResponse<Collection<VehicleManufacturer>>
     ) {
         every {
-            client.carManufacturers(authorization)
+            client.carManufacturers(authorization ?: any())
         } returns manufacturers.invoke()
     }
 

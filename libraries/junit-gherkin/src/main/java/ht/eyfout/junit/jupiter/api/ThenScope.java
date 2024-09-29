@@ -6,10 +6,11 @@ import java.util.Optional;
 
 public abstract class ThenScope implements ImmutableScope, WhenScopeExecutor {
     protected final WhenScopeExecutor executor;
-    public ThenScope(WhenScopeExecutor executor){
+    Map<Object, Object> miscellaneous = new HashMap<>();
+
+    public ThenScope(WhenScopeExecutor executor) {
         this.executor = executor;
     }
-    Map<Object, Object> miscellaneous = new HashMap<>();
 
     final Optional<String> getLabel() {
         return Optional.ofNullable((String) miscellaneous.get(ThenScope.class));

@@ -1,4 +1,3 @@
-
 include(":libraries:junit-gherkin")
 include(":libraries:rest-assured-http-scopes")
 //include(":libraries:micronaut-client-generator")
