@@ -9,7 +9,7 @@ repositories {
 dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     implementation project(":libraries:junit-gherkin")
-    implementation project(":libraries:http-provider")
+    implementation project(":libraries:gherkin-http-provider")
     implementation 'io.rest-assured:rest-assured:5.5.0'
 
     testImplementation(platform("org.junit:junit-bom:5.8.1"))

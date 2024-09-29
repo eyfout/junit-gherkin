@@ -1,7 +1,7 @@
 include(":bom")
 
 include(":libraries:junit-gherkin")
-include(":libraries:http-provider")
-include(":libraries:http-api-generator")
+include(":libraries:gherkin-http-provider")
+include(":libraries:gherkin-http-api-generator")
 
 include(":examples:micronaut-app")
