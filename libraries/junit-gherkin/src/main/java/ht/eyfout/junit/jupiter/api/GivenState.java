@@ -21,6 +21,7 @@ public abstract class GivenState implements MutableScope {
 
     public abstract GivenState copy();
 
+    @SuppressWarnings("unchecked")
     final <G extends GivenState> G copyWith() {
         GivenState other = copy();
         other.miscellaneous.putAll(miscellaneous);
