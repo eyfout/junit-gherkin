@@ -15,11 +15,11 @@ public class HttpAPIWhenScope extends WhenScope {
         this.givenState = givenState;
     }
 
-    final public HttpAPIRequestBuilder httpRequest(HttpAPI... api) {
+    final public <B extends HttpAPIRequestBuilder> B httpRequest(HttpAPI<B>... api) {
         if (api.length == 0) {
             throw new IllegalArgumentException("at least one Http API is required.");
         }
-        HttpAPIRequestBuilder builder = new HttpAPIRequestBuilder();
+        B builder = api[0].builder();
         httpRequests.add(new AbstractMap.SimpleEntry<>(api, builder));
         return builder;
     }

@@ -4,15 +4,19 @@ import ht.eyfout.junit.jupiter.api.GivenState;
 
 import java.util.Optional;
 
-public interface HttpAPI {
+public interface HttpAPI<B extends HttpAPIRequestBuilder> {
     String getHttpMethod();
 
     String getBasePath();
 
     Optional<String> getDescription();
 
+    default B builder(){
+        return (B)new HttpAPIRequestBuilder();
+    }
+
     @SuppressWarnings("unchecked")
-    default <B extends HttpAPIRequestExecutor> B executor(HttpAPIRequestBuilder builder, GivenState givenState) {
-        return (B) new HttpAPIRequestExecutor(this, builder, givenState);
+    default <Exec extends HttpAPIRequestExecutor> Exec executor(HttpAPIRequestBuilder builder, GivenState givenState) {
+        return (Exec) new HttpAPIRequestExecutor(this, builder, givenState);
     }
 }
