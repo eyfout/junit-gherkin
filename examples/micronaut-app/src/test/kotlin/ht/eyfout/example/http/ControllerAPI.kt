@@ -3,7 +3,7 @@ package ht.eyfout.example.http
 import ht.eyfout.junit.jupiter.api.http.HttpAPI
 import ht.eyfout.junit.jupiter.api.http.HttpAPIRequestExecutor
 
-enum class ServiceAPI : HttpAPI<HttpAPIRequestExecutor> {
+enum class ControllerAPI : HttpAPI<HttpAPIRequestExecutor> {
     VehiclesByManufacturerID {
         override fun getHttpMethod(): String = "GET"
 

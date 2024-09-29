@@ -4,7 +4,7 @@ import ht.eyfout.example.client.DMVClient
 import ht.eyfout.example.client.Vehicle
 import ht.eyfout.example.client.VehicleManufacturer
 import ht.eyfout.example.http.ExampleStateScopeProvider
-import ht.eyfout.example.http.ServiceAPI
+import ht.eyfout.example.http.ControllerAPI
 import ht.eyfout.junit.jupiter.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.TestFactory
 class ExampleTests {
 
     @MockBean(DMVClient::class)
-    fun dmvClient(): DMVClient = mockk()
+    val dmvClient: DMVClient = mockk()
 
     @Inject
     lateinit var provider: ExampleStateScopeProvider
@@ -52,11 +52,11 @@ class ExampleTests {
         }.fork(
             {
                 it.`when`("GET by manufacturer name") {
-                    it.httpRequest(ServiceAPI.VehiclesByManufacturerName)
+                    it.httpRequest(ControllerAPI.VehiclesByManufacturerName)
                         .queryParam("make", "Nissan")
                         .header("Authorization", "eyfout")
                 }.`when`("GET by manufacturer ID") {
-                    it.httpRequest(ServiceAPI.VehiclesByManufacturerID)
+                    it.httpRequest(ControllerAPI.VehiclesByManufacturerID)
                         .header("Authorization", "eyfout")
                         .pathParam("manufacturerID", "Nissan-#1")
                 }.then("Altima and Maxima") {
@@ -68,7 +68,7 @@ class ExampleTests {
             },
             {
                 it.`when`("GET all manufacturers") {
-                    it.httpRequest(ServiceAPI.Manufacturers)
+                    it.httpRequest(ControllerAPI.Manufacturers)
                         .header("Authorization", "eyfout")
                 }.then("Nissan, Ford, Subaru") {
                     assertEquals(HttpStatus.OK.code, it.httpResponse().statusCode())
@@ -92,15 +92,15 @@ class ExampleTests {
                 HttpResponse.unauthorized()
             }
         }.`when`("calling service api") {
-            it.httpRequest(ServiceAPI.VehiclesByManufacturerName)
+            it.httpRequest(ControllerAPI.VehiclesByManufacturerName)
                 .queryParam("make", "Nissan")
                 .header("Authorization", "other")
 
-            it.httpRequest(ServiceAPI.VehiclesByManufacturerID)
+            it.httpRequest(ControllerAPI.VehiclesByManufacturerID)
                 .header("Authorization", "other")
                 .pathParam("manufacturerID", "Nissan-#1")
 
-            it.httpRequest(ServiceAPI.Manufacturers)
+            it.httpRequest(ControllerAPI.Manufacturers)
                 .header("Authorization", "other")
         }.then("Http 401") {
             assertEquals(HttpStatus.UNAUTHORIZED.code, it.httpResponse().statusCode())

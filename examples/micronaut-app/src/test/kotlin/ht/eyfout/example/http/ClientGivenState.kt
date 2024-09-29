@@ -7,7 +7,7 @@ import ht.eyfout.junit.jupiter.api.GivenState
 import io.micronaut.http.HttpResponse
 import io.mockk.every
 
-data class ExampleGivenState(
+data class ClientGivenState(
     private val state: MutableMap<String, Any> = mutableMapOf(),
     val client: DMVClient
 ) : GivenState() {
@@ -30,8 +30,8 @@ data class ExampleGivenState(
         } returns manufacturers.invoke()
     }
 
-    override fun copy(): ExampleGivenState {
-        return ExampleGivenState(state.toMutableMap(), client)
+    override fun copy(): ClientGivenState {
+        return ClientGivenState(state.toMutableMap(), client)
     }
 
     override fun asMap(): MutableMap<String, Any> {
