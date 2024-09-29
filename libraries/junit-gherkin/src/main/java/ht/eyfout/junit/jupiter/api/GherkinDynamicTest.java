@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public interface GherkinDynamicTest<Given extends GivenState, When extends WhenScope, Then extends ThenScope> {
     static <Given extends GivenState, When extends WhenScope, Then extends ThenScope> GherkinDynamicTest<Given, When, Then> dynamicTest(
             StateScopeProvider<Given, When, Then> provider) {
-        return new StdGherkinDynamicTest(provider);
+        return new StdGherkinDynamicTest<>(provider);
     }
 
     FollowOn<When, Then> given(String label, Consumer<Given> given);

@@ -21,10 +21,10 @@ public abstract class GivenState implements MutableScope {
 
     public abstract GivenState copy();
 
-    final GivenState copyWith() {
+    final <G extends GivenState> G copyWith() {
         GivenState other = copy();
         other.miscellaneous.putAll(miscellaneous);
-        return other;
+        return (G)other;
     }
 
     abstract public Map<String, Object> asMap();

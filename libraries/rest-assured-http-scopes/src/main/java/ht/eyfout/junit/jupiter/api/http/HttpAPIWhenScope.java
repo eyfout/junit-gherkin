@@ -20,7 +20,7 @@ public class HttpAPIWhenScope extends WhenScope {
             throw new IllegalArgumentException("at least one Http API is required.");
         }
         HttpAPIRequestBuilder builder = new HttpAPIRequestBuilder();
-        httpRequests.add(new AbstractMap.SimpleEntry(api, builder));
+        httpRequests.add(new AbstractMap.SimpleEntry<>(api, builder));
         return builder;
     }
 

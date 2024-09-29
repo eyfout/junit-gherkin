@@ -19,11 +19,11 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
     }
 
     @Override
-    public FollowOn given(String label, Consumer<G> given) {
+    public FollowOn<W,T> given(String label, Consumer<G> given) {
         G givenState = provider.givenState();
         given.accept(givenState);
         givenState.setLabel(label);
-        return new StdFollowOn(provider, givenState);
+        return new StdFollowOn<>(provider, givenState);
     }
 
     static class StdFollowOn<G extends GivenState, W extends WhenScope, T extends ThenScope> implements FollowOn<W, T> {
@@ -40,13 +40,13 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         @Override
         public Stream<DynamicTest> fork(Function<FollowOn<W, T>, Stream<DynamicTest>>... fork) {
             return Arrays.stream(fork).flatMap(it ->
-                    it.apply(new StdFollowOn(provider, this.givenState.copyWith()))
+                    it.apply(new StdFollowOn<>(provider, this.givenState.copyWith()))
             );
         }
 
         @Override
-        public FollowOn when(String label, Consumer<W> when) {
-            W whenScope = provider.whenScope((G) givenState.copyWith());
+        public FollowOn<W,T> when(String label, Consumer<W> when) {
+            W whenScope = provider.whenScope(givenState.copyWith());
             when.accept(whenScope);
             whenScope.setLabel(label);
             whenScopes.add(whenScope);
@@ -66,14 +66,12 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         @Override
         public Stream<DynamicTest> then(String label, Consumer<T> then) {
             return whenScopes.stream()
-                    .flatMap(whenScope -> {
-                        return whenScope.scopeExecutor(givenState.copyWith()).map(executor -> {
-                            T thenScope = provider.thenScope(executor);
-                            return DynamicTest.dynamicTest(displayName(whenScope, label, executor.displayName()), () -> {
-                                then.accept(thenScope);
-                            });
-                        });
-                    });
+                    .flatMap(whenScope -> whenScope.scopeExecutor(givenState.copyWith()).map(executor -> {
+                        T thenScope = provider.thenScope(executor);
+                        return DynamicTest.dynamicTest(
+                                displayName(whenScope, label, executor.displayName()),
+                                () -> then.accept(thenScope));
+                    }));
 
         }
     }

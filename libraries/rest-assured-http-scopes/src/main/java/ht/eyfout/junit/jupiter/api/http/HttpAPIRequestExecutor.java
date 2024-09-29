@@ -41,9 +41,7 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
     public Optional<String> displayName() {
         StringBuilder sb = new StringBuilder();
 
-        api.getDescription().ifPresent(it -> {
-            sb.append(" [[").append(it).append(" ]] => ");
-        });
+        api.getDescription().ifPresent(it -> sb.append(" [[").append(it).append(" ]] => "));
 
         String queryParams = "?";
         if (!builder.queryParams.isEmpty()) {
