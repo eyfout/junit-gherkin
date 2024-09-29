@@ -14,12 +14,12 @@ class VehiclesController(private val dmvClient: DMVClient) {
     suspend fun vehicles(
         @Header("Authorization") authorization: String,
         @QueryValue("make") make: String
-    ): Stream<Vehicle> {
-        return dmvClient.carManufacturers(authorization).stream().filter {
+    ): List<Vehicle> {
+        return dmvClient.carManufacturers(authorization).body().stream().filter {
             it.name == make
         }.flatMap {
-            dmvClient.vehicles(authorization, it.id).stream()
-        }
+            dmvClient.vehicles(authorization, it.id).body().stream()
+        }.toList()
     }
 
 

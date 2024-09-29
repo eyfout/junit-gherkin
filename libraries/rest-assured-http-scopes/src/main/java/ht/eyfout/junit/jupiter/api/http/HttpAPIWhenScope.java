@@ -14,7 +14,7 @@ public class HttpAPIWhenScope extends WhenScope {
         this.givenState = givenState;
     }
 
-    final public HttpAPIRequestBuilder request(HttpAPI... api) {
+    final public HttpAPIRequestBuilder httpRequest(HttpAPI... api) {
         if (api.length == 0) {
             throw new IllegalArgumentException("at least one Http API is required.");
         }

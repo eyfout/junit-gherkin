@@ -12,12 +12,15 @@ you **MUST** use the *@TestFactory* annotation,
 see [dynamic tests](https://junit.org/junit5/docs/current/user-guide/#writing-tests-dynamic-tests)
 for more information.
 
+ The following is a psuedo-code is an example of how tests can be written using
+this framework:
 ```java
 @TestFactory
-Stream<DynamicTest> hello(){
+Stream<DynamicTest> inventory(){
     return GherkinDynamicTest.dynamicTest(provider)
-            .given("vehicle inventory"){ ... }
-            .when("request for specific make and model") { ... } 
-            .then("Altima, Impreza"){ ... };
+            .given("vehicle inventory",it -> { ... })
+            .when("request for vehicles by make", it-> { ... }) 
+            .then("Altima, Rogue", it->{ ... });
 }
 ```
+ 
