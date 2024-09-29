@@ -3,8 +3,8 @@ package ht.eyfout.example
 import ht.eyfout.example.client.DMVClient
 import ht.eyfout.example.client.Vehicle
 import ht.eyfout.example.client.VehicleManufacturer
-import ht.eyfout.example.http.ExampleStateScopeProvider
 import ht.eyfout.example.http.ControllerAPI
+import ht.eyfout.example.http.ExampleStateScopeProvider
 import ht.eyfout.junit.jupiter.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
@@ -48,7 +48,6 @@ class ExampleTests {
                     )
                 )
             }
-
         }.fork(
             {
                 it.`when`("GET by manufacturer name") {

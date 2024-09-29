@@ -1,0 +1,16 @@
+plugins{
+    id 'java-platform'
+}
+
+description 'ht.eyfout.junit BOM'
+dependencies {
+    constraints {
+        project(":libraries").subprojects.forEach {
+            api(project(it.path))
+        }
+    }
+}
+
+javaPlatform {
+    allowDependencies()
+}

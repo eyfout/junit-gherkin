@@ -1,5 +1,7 @@
+include(":bom")
+
 include(":libraries:junit-gherkin")
 include(":libraries:rest-assured-http-scopes")
-//include(":libraries:micronaut-client-generator")
+include(":libraries:micronaut-client-generator")
 
 include(":examples:micronaut-app")
