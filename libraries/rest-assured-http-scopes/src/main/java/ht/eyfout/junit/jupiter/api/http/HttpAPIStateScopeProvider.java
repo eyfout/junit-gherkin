@@ -4,18 +4,18 @@ import ht.eyfout.junit.jupiter.api.GivenState;
 import ht.eyfout.junit.jupiter.api.StateScopeProvider;
 import ht.eyfout.junit.jupiter.api.WhenScopeExecutor;
 
-public abstract class HttpAPIStateScopeProvider<Given extends GivenState, When extends HttpAPIWhenScope, Then extends HttpAPIThenScope> implements StateScopeProvider<Given, HttpAPIWhenScope, HttpAPIThenScope> {
+public abstract class HttpAPIStateScopeProvider<Given extends GivenState, When extends HttpAPIWhenScope, Then extends HttpAPIThenScope> implements StateScopeProvider<Given, When, Then> {
     public HttpAPIStateScopeProvider() {
 
     }
 
     @Override
-    public HttpAPIWhenScope whenScope(Given givenState) {
-        return new HttpAPIWhenScope(givenState);
+    public When whenScope(Given givenState) {
+        return (When)new HttpAPIWhenScope(givenState);
     }
 
     @Override
-    public HttpAPIThenScope thenScope(WhenScopeExecutor executor) {
-        return new HttpAPIThenScope(executor);
+    public Then thenScope(WhenScopeExecutor executor) {
+        return (Then)new HttpAPIThenScope(executor);
     }
 }

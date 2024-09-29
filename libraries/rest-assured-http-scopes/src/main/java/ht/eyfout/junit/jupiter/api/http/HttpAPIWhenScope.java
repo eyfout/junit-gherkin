@@ -9,11 +9,10 @@ import java.util.stream.Stream;
 
 public class HttpAPIWhenScope extends WhenScope {
     final protected List<Map.Entry<HttpAPI[], HttpAPIRequestBuilder>> httpRequests = new ArrayList<>();
-    final protected GivenState givenState;
+    protected GivenState givenState;
     public HttpAPIWhenScope(GivenState givenState){
         this.givenState = givenState;
     }
-
 
     final public HttpAPIRequestBuilder request(HttpAPI... api) {
         if (api.length == 0) {

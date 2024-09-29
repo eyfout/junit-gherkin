@@ -1,0 +1,7 @@
+micronaut:
+  server:
+    host: 0.0.0.0
+    port: ${MICRONAUT_PORT:8080}
+
+  security:
+    enabled: false

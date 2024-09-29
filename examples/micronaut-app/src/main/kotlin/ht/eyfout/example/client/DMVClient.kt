@@ -6,7 +6,7 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.client.annotation.Client
 
 @Client
-interface DMV {
+interface DMVClient {
     @Get("v1/manufacturers")
     fun carManufacturers(
         @Header authorization: String
