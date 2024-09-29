@@ -16,22 +16,17 @@ class VehiclesController(private val dmvClient: DMVClient) {
     suspend fun vehicles(
         @Header("Authorization") authorization: String,
         @QueryValue("make") make: String
-    ): Collection<Vehicle> {
+    ): HttpResponse<Collection<Vehicle>> {
         val httpResponse = dmvClient.carManufacturers(authorization)
-        when (httpResponse.code()) {
-            HttpStatus.OK.code -> httpResponse.body().stream().filter {
+        return when (httpResponse.code()) {
+            HttpStatus.OK.code -> HttpResponse.ok(httpResponse.body().stream().filter {
                 it.name == make
             }.flatMap {
                 dmvClient.vehicles(authorization, it.id).body().stream()
-            }.toList()
+            }.toList())
 
-            else -> httpResponse
+            else -> httpResponse as HttpResponse<Collection<Vehicle>>
         }
-        return httpResponse.body().stream().filter {
-            it.name == make
-        }.flatMap {
-            dmvClient.vehicles(authorization, it.id).body().stream()
-        }.toList()
     }
 
     @Get("manufacturers/{manufacturerID}/vehicles")

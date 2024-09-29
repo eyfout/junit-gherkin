@@ -22,9 +22,9 @@ this framework:
 @TestFactory
 Stream<DynamicTest> inventory() {
     return GherkinDynamicTest.dynamicTest(provider)
-            .given("vehicle inventory", it -> { ...})
-            .when("request for vehicles by make", it -> { ...})
-            .then("Altima, Rogue", it -> { ...});
+            .given("vehicle inventory", it -> { })
+            .when("request for vehicles by make", it -> { })
+            .then("Altima, Rogue", it -> { });
 }
 ```
  
