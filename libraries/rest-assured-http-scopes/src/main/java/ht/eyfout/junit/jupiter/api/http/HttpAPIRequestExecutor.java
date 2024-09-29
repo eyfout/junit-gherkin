@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class HttpAPIRequestExecutor implements WhenScopeExecutor {
-    private final HttpAPI<HttpAPIRequestExecutor> api;
+    private final HttpAPI api;
     private final HttpAPIRequestBuilder builder;
     private final GivenState givenState;
     private Response httpResponse;
 
-    HttpAPIRequestExecutor(HttpAPI<HttpAPIRequestExecutor> api, HttpAPIRequestBuilder builder, GivenState givenState) {
+    HttpAPIRequestExecutor(HttpAPI api, HttpAPIRequestBuilder builder, GivenState givenState) {
         this.api = api;
         this.builder = builder;
         this.givenState = givenState;

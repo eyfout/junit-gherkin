@@ -4,7 +4,7 @@ import ht.eyfout.junit.jupiter.api.GivenState;
 
 import java.util.Optional;
 
-public interface HttpAPI<B> {
+public interface HttpAPI {
     String getHttpMethod();
 
     String getBasePath();
@@ -13,6 +13,6 @@ public interface HttpAPI<B> {
 
     @SuppressWarnings("unchecked")
     default <B extends HttpAPIRequestExecutor> B executor(HttpAPIRequestBuilder builder, GivenState givenState) {
-        return (B) new HttpAPIRequestExecutor((HttpAPI)this, builder, givenState);
+        return (B) new HttpAPIRequestExecutor(this, builder, givenState);
     }
 }

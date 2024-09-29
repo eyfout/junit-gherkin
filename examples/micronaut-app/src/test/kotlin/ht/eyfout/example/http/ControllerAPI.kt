@@ -1,10 +1,9 @@
 package ht.eyfout.example.http
 
 import ht.eyfout.junit.jupiter.api.http.HttpAPI
-import ht.eyfout.junit.jupiter.api.http.HttpAPIRequestExecutor
 import java.util.*
 
-enum class ControllerAPI : HttpAPI<HttpAPIRequestExecutor> {
+enum class ControllerAPI : HttpAPI {
     VehiclesByManufacturerID {
         override fun getHttpMethod(): String = "GET"
         override fun getBasePath(): String = "v1/manufacturers/{manufacturerID}/vehicles"
