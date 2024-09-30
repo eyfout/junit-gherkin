@@ -11,6 +11,9 @@ dependencies {
     implementation project(":libraries:gherkin-http-provider")
     implementation libs.rest.assured
     implementation libs.junit.jupiter.api
+    implementation libs.openapi.generator
+    implementation libs.ow2.asm
+    implementation libs.ow2.asm.util
 
     testImplementation(platform(libs.junit.jupiter))
     testImplementation(libs.junit.jupiter.engine)
