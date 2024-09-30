@@ -26,6 +26,7 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
         /**
          * Furcate the given state into multiple {@link FollowOn} that MUST
          * terminate with {@link #then(String, Consumer)}.
+         *
          * @param fork
          * @return {@link }
          */
@@ -34,6 +35,7 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
         /**
          * When is where you stimulate your feature / api.
          * This scope can be repeated any number of times with duplication.
+         *
          * @param label optional label
          * @return {@link FollowOn} for chaining
          */
@@ -42,6 +44,7 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
         /**
          * Then is where you verify the expected outcome.
          * This is a terminal operation. No other operation may follow.
+         *
          * @param label
          * @return {@link Stream} of {@link DynamicTest}.
          */

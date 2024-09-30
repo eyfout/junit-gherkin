@@ -8,8 +8,6 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -51,35 +49,52 @@ public class HttpAPIGenerator {
         new String(b, StandardCharsets.UTF_8);
     }
 
+    class ClassMeta {
+        public final String name;
+        public final String pkg;
+        public final String canonical;
+
+        public ClassMeta(String pkg, String name, String[] parents) {
+            this.name = name;
+            this.pkg = pkg;
+            this.canonical = pkg + "/" + name;
+        }
+
+        ClassWriter writer(){
+            ClassWriter writer = new ClassWriter(0);
+            writer.visit(Opcodes.V1_5,
+                    Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL,
+                    canonical,
+                    null,
+                    OBJECT.getInternalName(),
+                    new String[]{HTTP_API_REQUEST_BUILDER.getInternalName()});
+            return writer;
+        }
+    }
+
     void httpRequestBuilder(Operation op) {
         Map<String, List<Parameter>> params = new HashMap<>();
         Optional.ofNullable(op.getParameters()).ifPresent(parameters -> {
-            params.putAll( parameters
+            params.putAll(parameters
                     .stream()
                     .collect(Collectors.groupingBy(it -> className(it.getIn().toLowerCase()))));
         });
 
-        final String name = pkg + className(op.getOperationId());
-        final ClassWriter builderWriter = new ClassWriter(0);
-        final String builderClassName = name + "RequestBuilder";
-        builderWriter.visit(Opcodes.V1_5,
-                Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL,
-                builderClassName,
-                null,
-                OBJECT.getInternalName(),
-                new String[]{HTTP_API_REQUEST_BUILDER.getInternalName()});
+
+        final String name = className(op.getOperationId());
+        ClassMeta builder = new ClassMeta(pkg, name + "RequestBuilder", new String[]{});
+        ClassMeta api = new ClassMeta(pkg, name + "HttpAPI", new String[]{});
+
+        final ClassWriter builderWriter = builder.writer();
         IN.forEach(in -> {
-            parameter(builderClassName, in, params.getOrDefault(in, Collections.emptyList()));
+            parameter(api.canonical, in, params.getOrDefault(in, Collections.emptyList()));
             builderWriter.visitMethod(Opcodes.ACC_PUBLIC,
                     in.toLowerCase(),
-                    Type.getMethodDescriptor(Type.getType(builderClassName), CONSUMER),
+                    Type.getMethodDescriptor(Type.getType(builder.canonical), CONSUMER),
                     null,
                     null);
         });
         builderWriter.visitEnd();
-
-        final ClassWriter apiWriter = new ClassWriter(0);
-        final String httpAPIClassName = name + "HttpAPI";
 
     }
 

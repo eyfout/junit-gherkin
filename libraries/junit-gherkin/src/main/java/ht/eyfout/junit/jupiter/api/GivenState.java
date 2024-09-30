@@ -25,7 +25,7 @@ public abstract class GivenState implements MutableScope {
     final <G extends GivenState> G copyWith() {
         GivenState other = copy();
         other.miscellaneous.putAll(miscellaneous);
-        return (G)other;
+        return (G) other;
     }
 
     abstract public Map<String, Object> asMap();

@@ -12,7 +12,12 @@ public interface HttpAPI<B extends HttpAPIRequestBuilder> {
     Optional<String> getDescription();
 
     default B builder(){
-        return (B)new HttpAPIRequestBuilder();
+        return builder(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    default B builder(GivenState givenState){
+        return (B)new HttpAPIRequestBuilder((HttpAPI<HttpAPIRequestBuilder>) this, givenState);
     }
 
     @SuppressWarnings("unchecked")

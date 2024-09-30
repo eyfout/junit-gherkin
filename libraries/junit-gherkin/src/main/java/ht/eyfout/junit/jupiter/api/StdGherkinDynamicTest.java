@@ -19,7 +19,7 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
     }
 
     @Override
-    public FollowOn<W,T> given(String label, Consumer<G> given) {
+    public FollowOn<W, T> given(String label, Consumer<G> given) {
         G givenState = provider.givenState();
         given.accept(givenState);
         givenState.setLabel(label);
@@ -45,7 +45,7 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         }
 
         @Override
-        public FollowOn<W,T> when(String label, Consumer<W> when) {
+        public FollowOn<W, T> when(String label, Consumer<W> when) {
             W whenScope = provider.whenScope(givenState.copyWith());
             when.accept(whenScope);
             whenScope.setLabel(label);

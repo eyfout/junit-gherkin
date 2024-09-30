@@ -27,16 +27,6 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
     }
 
 
-    private Map<String, Object> pathParams() {
-        Map<String, Object> given = givenState.asMap();
-        return Arrays.stream(api.getBasePath().split("/"))
-                .filter(it -> it.startsWith("{") && it.endsWith("}"))
-                .map(it -> it.substring(1, it.length() - 1))
-                .map(it -> new AbstractMap.SimpleEntry<>(it, given.get(it)))
-                .filter(it -> it.getValue() != null)
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-    }
-
     @Override
     public Optional<String> displayName() {
         StringBuilder sb = new StringBuilder();
@@ -44,8 +34,8 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
         api.getDescription().ifPresent(it -> sb.append(" [[").append(it).append(" ]] => "));
 
         String queryParams = "?";
-        if (!builder.queryParams.isEmpty()) {
-            queryParams += builder.queryParams.entrySet().stream()
+        if (!builder.getQueryParams().isEmpty()) {
+            queryParams += builder.getQueryParams().entrySet().stream()
                     .map(it -> it.getKey() + "=" + it.getValue())
                     .collect(Collectors.joining("&"));
         }
@@ -54,20 +44,16 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
                 .append(" ")
                 .append(api.getBasePath())
                 .append(queryParams);
-
-
         return Optional.of(sb.toString());
     }
 
     final protected RequestSpecification specification() {
-        Map<String, Object> pathParams = pathParams();
-        pathParams.putAll(builder.pathParams);
         RequestSpecification spec = RestAssured.given()
                 .basePath(api.getBasePath())
-                .headers(builder.headers)
-                .queryParams(builder.queryParams)
-                .pathParams(pathParams);
-        builder.body.ifPresent(spec::body);
+                .headers(builder.getHeaders())
+                .queryParams(builder.getQueryParams())
+                .pathParams(builder.getPathParams());
+        builder.getBody().ifPresent(spec::body);
         return spec;
     }
 
@@ -75,8 +61,6 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
     @SuppressWarnings("unchecked")
     public <R> R exec() {
         if (httpResponse == null) {
-            Map<String, Object> pathParams = pathParams();
-            pathParams.putAll(builder.pathParams);
             try {
                 httpResponse = specification().request(Method.valueOf(api.getHttpMethod().toUpperCase()));
             } catch (Throwable e) {
@@ -84,7 +68,6 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
                     throw new IllegalStateException("Unable to connect to " + api.toString(), e);
                 }
                 throw e;
-
             }
         }
         return (R) httpResponse;
