@@ -1,5 +1,7 @@
 package ht.eyfout.junit.jupiter.http;
 
+import ht.eyfout.junit.jupiter.http.generated.GherkinJUnitHttpAPI;
+import ht.eyfout.junit.jupiter.http.generated.GherkinJUnitRequestBuilder;
 import io.swagger.v3.oas.models.Operation;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -14,20 +16,56 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 class GherkinClassVisitor extends ClassVisitor {
+    static final String PREFIX = "GherkinJUnit";
 
-    private final List<? extends Map.Entry<Operation, GherkinNode>> reference;
+    private static String replacement(Class<?> klass, String alt) {
+        return klass.getSimpleName().replace(PREFIX, alt);
+    }
+
+    private static String replace(String orig, Class<?> klass, String alt) {
+        return orig.replace(klass.getSimpleName(), replacement(klass, alt));
+    }
+
+    private static String replace(String orig, String alt) {
+        if (Objects.isNull(orig)) {
+            return orig;
+        } else {
+            String value = replace(
+                    replace(
+                            orig,
+                            GherkinJUnitRequestBuilder.class,
+                            alt),
+                    GherkinJUnitHttpAPI.class,
+                    alt);
+            return replace(
+                    replace(
+                            replace(value, GherkinJUnitRequestBuilder.GherkinJUnitPathParam.class, alt),
+                            GherkinJUnitRequestBuilder.GherkinJUnitQueryParam.class,
+                            alt),
+                    GherkinJUnitRequestBuilder.GherkinJUnitHeaderParam.class,
+                    alt);
+        }
+    }
+
+    private static String classCase(String name) {
+        return name.toUpperCase().charAt(0) + name.substring(1);
+    }
+
+    private final List<? extends Map.Entry<Operation, GherkinNode>> operations;
+    private final Class<?> klass;
 
     public GherkinClassVisitor(int api, Collection<Operation> op, Class<?> klass) {
         super(api);
-        reference = op.stream().map(it -> toEntry(api, it)).toList();
+        operations = op.stream().map(it -> toEntry(api, it)).toList();
+        this.klass = klass;
     }
 
     private static Map.Entry<Operation, GherkinNode> toEntry(int api, Operation op) {
-        return new AbstractMap.SimpleEntry<>(op, new GherkinNode(new ClassNode(api), Take2.classCase(op.getOperationId()), new ArrayList<>()));
+        return new AbstractMap.SimpleEntry<>(op, new GherkinNode(new ClassNode(api), classCase(op.getOperationId()), new ArrayList<>()));
     }
 
     public <R> Stream<R> write(BiFunction<ClassNode, MethodNode, R> func) {
-        return reference.stream().map(ref -> {
+        return operations.stream().map(ref -> {
             return func.apply(ref.getValue().klass, null);
         });
     }
@@ -41,10 +79,10 @@ class GherkinClassVisitor extends ClassVisitor {
     }
 
     private void forEach(Method method, Object... values) {
-        reference.forEach(op -> {
+        operations.forEach(op -> {
             Object[] replacements = Arrays.stream(values).map(value -> {
                 if (value instanceof String) {
-                    return Take2.replace((String) value, op.getValue().name);
+                    return replace((String) value, op.getValue().name);
                 } else {
                     return value;
                 }
