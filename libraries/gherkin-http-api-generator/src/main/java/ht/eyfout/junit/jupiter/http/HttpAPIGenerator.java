@@ -8,8 +8,6 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.ParameterNode;
 
@@ -25,14 +23,12 @@ public class HttpAPIGenerator {
     private static final Type STRING = Type.getType(String.class);
     private static final Type CONSUMER = Type.getType(Consumer.class);
     private static final Type OBJECT = Type.getType(Object.class);
+    private static final Collection<String> IN = List.of(className("path"), className("query"), className("header"));
+    private final String ns = "ht.eyfout.junit.jupiter.http.generated";
 
     private static String className(String name) {
         return ("" + name.charAt(0)).toUpperCase() + name.substring(1);
     }
-
-    private static final Collection<String> IN = List.of(className("path"), className("query"), className("header"));
-
-    private final String ns = "ht.eyfout.junit.jupiter.http.generated";
 
     Stream<ClassTemplate> httpRequestBuilder(Operation op) {
 
@@ -78,7 +74,7 @@ public class HttpAPIGenerator {
             node.name = "set" + className(it.getName());
             node.access = Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL;
             node.parameters.add(new ParameterNode("consumer", Opcodes.ACC_PUBLIC));
-            node.desc = "("+ STRING.getInternalName() +")";
+            node.desc = "(" + STRING.getInternalName() + ")";
 
 
             return node;

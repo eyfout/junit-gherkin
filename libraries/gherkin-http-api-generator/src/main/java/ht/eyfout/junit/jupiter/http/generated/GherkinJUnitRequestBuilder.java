@@ -11,37 +11,41 @@ public class GherkinJUnitRequestBuilder<H, P, Q> extends HttpAPIRequestBuilder {
         super(api, givenState);
     }
 
-    public GherkinJUnitRequestBuilder<H, P, Q> header(Consumer<H> consumer){
-        consumer.accept((H)new GherkinJUnitHeaderParam(this));
+    public GherkinJUnitRequestBuilder<H, P, Q> header(Consumer<H> consumer) {
+        consumer.accept((H) new GherkinJUnitHeaderParam(this));
         return this;
     }
 
-    public GherkinJUnitRequestBuilder<H, P, Q> pathParams(Consumer<P> consumer){
-        consumer.accept((P)new GherkinJUnitPathParam(this));
+    public GherkinJUnitRequestBuilder<H, P, Q> pathParams(Consumer<P> consumer) {
+        consumer.accept((P) new GherkinJUnitPathParam(this));
         return this;
     }
-    public GherkinJUnitRequestBuilder<H, P, Q> queryParams(Consumer<Q> consumer){
-        consumer.accept((Q)new GherkinJUnitQueryParam(this));
+
+    public GherkinJUnitRequestBuilder<H, P, Q> queryParams(Consumer<Q> consumer) {
+        consumer.accept((Q) new GherkinJUnitQueryParam(this));
         return this;
     }
 
     static public class GherkinJUnitHeaderParam {
         private final HttpAPIRequestBuilder builder;
-        public GherkinJUnitHeaderParam(HttpAPIRequestBuilder builder){
+
+        public GherkinJUnitHeaderParam(HttpAPIRequestBuilder builder) {
             this.builder = builder;
         }
     }
 
     static public class GherkinJUnitQueryParam {
         private final HttpAPIRequestBuilder builder;
-        public GherkinJUnitQueryParam(HttpAPIRequestBuilder builder){
+
+        public GherkinJUnitQueryParam(HttpAPIRequestBuilder builder) {
             this.builder = builder;
         }
     }
 
     static public class GherkinJUnitPathParam {
         private final HttpAPIRequestBuilder builder;
-        public GherkinJUnitPathParam(HttpAPIRequestBuilder builder){
+
+        public GherkinJUnitPathParam(HttpAPIRequestBuilder builder) {
             this.builder = builder;
         }
     }

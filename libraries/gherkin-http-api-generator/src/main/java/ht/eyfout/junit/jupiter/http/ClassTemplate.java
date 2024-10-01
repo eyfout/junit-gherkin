@@ -17,8 +17,8 @@ class ClassTemplate {
     private static final Type HTTP_API = Type.getType(HttpAPI.class);
 
     public final String name;
-    private final String ns;
     public final Type type;
+    private final String ns;
     private ClassNode node;
 
     public ClassTemplate(String ns, String name) {
@@ -35,8 +35,21 @@ class ClassTemplate {
         return Optional.empty();
     }
 
-    protected Collection<Type> annotations(){
+    protected Collection<Type> annotations() {
         return Collections.emptyList();
+    }
+
+    ClassNode asmNode() {
+        if (node == null) {
+            node = new ClassNode(Opcodes.V1_5);
+            node.name = type.getInternalName();
+            node.access = Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL;
+            node.superName = superType().getInternalName();
+            node.interfaces = interfaces().orElseGet(Collections::emptyList)
+                    .stream()
+                    .map(Type::getInternalName).toList();
+        }
+        return node;
     }
 
     static class RequestBuilderClassTemplate extends ClassTemplate {
@@ -70,20 +83,7 @@ class ClassTemplate {
     static class HttpParamClassTemplate extends ClassTemplate {
         public HttpParamClassTemplate(ClassTemplate parent, String name) {
             super(parent.ns, parent.name + "$In" + name);
-            parent.asmNode().visitInnerClass(name,type.getInternalName(), type.getInternalName(), Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC);
+            parent.asmNode().visitInnerClass(name, type.getInternalName(), type.getInternalName(), Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC);
         }
-    }
-
-    ClassNode asmNode() {
-        if (node == null) {
-            node = new ClassNode(Opcodes.V1_5);
-            node.name = type.getInternalName();
-            node.access = Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL;
-            node.superName = superType().getInternalName();
-            node.interfaces = interfaces().orElseGet(Collections::emptyList)
-                    .stream()
-                    .map(Type::getInternalName).toList();
-        }
-        return node;
     }
 }

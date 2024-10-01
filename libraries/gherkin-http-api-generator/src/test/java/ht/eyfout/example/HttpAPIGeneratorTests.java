@@ -15,23 +15,6 @@ public class HttpAPIGeneratorTests {
 
     @Test
     void generate() {
-        GherkinDynamicTest.dynamicTest(new HttpAPIStateScopeProvider<>() {
-            @Override
-            public GivenState givenState() {
-                return null;
-            }
-        }).given("", it ->{}).when("", it ->{
-
-            it.httpRequest(new GherkinJUnitHttpAPI<GherkinJUnitRequestBuilder.GherkinJUnitHeaderParam, GherkinJUnitRequestBuilder.GherkinJUnitPathParam, GherkinJUnitRequestBuilder.GherkinJUnitQueryParam>())
-                    .header(h -> {
-
-                    }).pathParams(p ->{
-
-                    }).queryParams(q ->{
-
-                    });
-
-        });
         URL resource = HttpAPIGeneratorTests.class.getClassLoader().getResource("swagger.yml");
 //        new HttpAPIGenerator().generate(resource);
         Take2.generate(resource);
