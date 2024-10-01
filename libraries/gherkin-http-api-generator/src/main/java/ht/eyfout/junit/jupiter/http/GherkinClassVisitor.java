@@ -17,6 +17,14 @@ import java.util.stream.Stream;
 
 class GherkinClassVisitor extends ClassVisitor {
     static final String PREFIX = "GherkinJUnit";
+    private final List<? extends Map.Entry<Operation, GherkinNode>> operations;
+    private final Class<?> klass;
+
+    public GherkinClassVisitor(int api, Collection<Operation> op, Class<?> klass) {
+        super(api);
+        operations = op.stream().map(it -> toEntry(api, it)).toList();
+        this.klass = klass;
+    }
 
     private static String replacement(Class<?> klass, String alt) {
         return klass.getSimpleName().replace(PREFIX, alt);
@@ -49,15 +57,6 @@ class GherkinClassVisitor extends ClassVisitor {
 
     private static String classCase(String name) {
         return name.toUpperCase().charAt(0) + name.substring(1);
-    }
-
-    private final List<? extends Map.Entry<Operation, GherkinNode>> operations;
-    private final Class<?> klass;
-
-    public GherkinClassVisitor(int api, Collection<Operation> op, Class<?> klass) {
-        super(api);
-        operations = op.stream().map(it -> toEntry(api, it)).toList();
-        this.klass = klass;
     }
 
     private static Map.Entry<Operation, GherkinNode> toEntry(int api, Operation op) {
