@@ -30,7 +30,7 @@ data class ClientGivenState(
         } returns manufacturers.invoke()
     }
 
-    override fun copy(): ClientGivenState {
+    fun copy(): ClientGivenState {
         return ClientGivenState(state.toMutableMap(), client)
     }
 
