@@ -63,9 +63,9 @@ class GherkinClassVisitor extends ClassVisitor {
         return new AbstractMap.SimpleEntry<>(op, new GherkinNode(new ClassNode(api), classCase(op.getOperationId()), new ArrayList<>()));
     }
 
-    public <R> Stream<R> write(BiFunction<ClassNode, MethodNode, R> func) {
+    public <R> Stream<R> write(BiFunction<ClassNode, Class<?>, R> func) {
         return operations.stream().map(ref -> {
-            return func.apply(ref.getValue().klass, null);
+            return func.apply(ref.getValue().klass, klass);
         });
     }
 

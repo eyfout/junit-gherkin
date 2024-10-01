@@ -10,7 +10,6 @@ public class HttpAPIGeneratorTests {
     @Test
     void generate() {
         URL resource = HttpAPIGeneratorTests.class.getClassLoader().getResource("swagger.yml");
-//        new HttpAPIGenerator().generate(resource);
         HttAPICodeGenerator.generate(resource);
     }
 }
