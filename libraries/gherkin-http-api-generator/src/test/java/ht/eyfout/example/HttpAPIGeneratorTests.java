@@ -13,6 +13,4 @@ public class HttpAPIGeneratorTests {
         CodeGenerator.generate(resource);
 
     }
-
-
 }
