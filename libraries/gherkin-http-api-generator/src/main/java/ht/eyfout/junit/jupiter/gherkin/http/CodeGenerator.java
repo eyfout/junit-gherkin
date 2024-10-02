@@ -41,8 +41,14 @@ final public class CodeGenerator {
                         .forEach(klass -> {
                             int dot = klass.getName().lastIndexOf('.');
                             String fName = klass.getName().substring(dot + 1).replace("GjCG", api.id()) + ".class";
+                            byte[] content = generate(klass, api, it -> {
+                                if (it != null) {
+                                    return it.replace("GjCG", api.id());
+                                }
+                                return it;
+                            });
 
-                            createFile(rootDir, fName, klass, generate(klass, api));
+                            createFile(rootDir, fName, klass, content);
                         })
         );
     }
@@ -66,7 +72,7 @@ final public class CodeGenerator {
     }
 
 
-    static byte[] generate(Class<?> klass, SwaggerAPI api) {
+    static byte[] generate(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
         ClassReader reader = asClassReader(klass);
         ClassWriter source = new ClassWriter(reader, 0);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -74,12 +80,7 @@ final public class CodeGenerator {
                         Opcodes.ASM7,
                         source,
                         sink,
-                        it -> {
-                            if (it != null) {
-                                return it.replace("GjCG", api.id());
-                            }
-                            return it;
-                        }, (name, descriptor, it) -> {
+                        rename, (name, descriptor, it) -> {
                     if (klass == GjCGHttpAPI.class) {
                         return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
                     } else {
