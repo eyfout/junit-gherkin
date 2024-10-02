@@ -6,8 +6,10 @@ import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder;
 
 import java.util.function.Consumer;
 
-public class GjCGRequestBuilder<H, P, Q> extends HttpAPIRequestBuilder {
-    public GjCGRequestBuilder(HttpAPI<HttpAPIRequestBuilder> api, GivenState givenState) {
+public class GjCGRequestBuilder<    H extends GjCGRequestBuilder.GjCGHeader,
+        P extends GjCGRequestBuilder.GjCGPath,
+        Q extends GjCGRequestBuilder.GjCGQuery> extends HttpAPIRequestBuilder {
+    public GjCGRequestBuilder(GjCGHttpAPI<H,P,Q> api, GivenState givenState) {
         super(api, givenState);
     }
 

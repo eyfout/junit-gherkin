@@ -11,9 +11,9 @@ public class HttpAPIRequestBuilder {
     final private Map<String, Object> pathParams = new HashMap<>();
     private Optional<Object> body = Optional.empty();
     final private Optional<GivenState> givenState;
-    final HttpAPI<HttpAPIRequestBuilder> api;
+    final HttpAPI<? extends HttpAPIRequestBuilder> api;
 
-    public HttpAPIRequestBuilder(HttpAPI<HttpAPIRequestBuilder> api, GivenState givenState) {
+    public HttpAPIRequestBuilder(HttpAPI<? extends HttpAPIRequestBuilder> api, GivenState givenState) {
         this.api = api;
         this.givenState = Optional.ofNullable(givenState);
     }
