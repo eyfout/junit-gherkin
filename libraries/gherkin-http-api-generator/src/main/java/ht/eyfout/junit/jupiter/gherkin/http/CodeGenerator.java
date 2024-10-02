@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class CodeGenerator {
@@ -35,7 +36,7 @@ public class CodeGenerator {
             Class<?> klass = GjCGHttpAPI.class;
             ClassReader reader = asClassReader(klass);
             ClassWriter source = new ClassWriter(reader, 0);
-            ClassWriter sink = new ClassWriter(0);
+            ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
             reader.accept(new HttpClassVisitor(
                             Opcodes.ASM7,
                             source,
@@ -46,7 +47,7 @@ public class CodeGenerator {
                                 }
                                 return it;
                             }),
-                    Opcodes.V1_5);
+                    0);
 
             int dot = klass.getName().lastIndexOf(".");
             File pkg = new File(rootDir, klass.getName().substring(0, dot).replace('.', '/') + "/");
@@ -67,7 +68,7 @@ public class CodeGenerator {
     }
 
     static class HttpClassVisitor extends ClassVisitor {
-        private final ClassVisitor source;
+        //                private final ClassVisitor source;
         private final ClassVisitor sink;
         private final Function<String, String> rebrand;
 
@@ -75,10 +76,26 @@ public class CodeGenerator {
                                 ClassVisitor source,
                                 ClassVisitor sink,
                                 Function<String, String> rebrand) {
-            super(api, source);
-            this.source = source;
+            super(api, sink);
+//            this.source = source;
             this.sink = sink;
             this.rebrand = rebrand;
+        }
+
+        @Override
+        public void visitAttribute(Attribute attribute) {
+            invoke(method("visitAttribute", Attribute.class), attribute);
+        }
+
+        @Override
+        public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+            return invoke(method("visitTypeAnnotation", int.class, TypePath.class, String.class, boolean.class),
+                    typeRef, typePath, descriptor, visible);
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            return invoke(method("visitAnnotation", String.class, boolean.class), descriptor, visible);
         }
 
         @Override
@@ -88,8 +105,8 @@ public class CodeGenerator {
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-            return new HttpMethodVisitor(api, source.visitMethod(access, name, descriptor, signature, exceptions),
-                    sink.visitMethod(access, rename(name), rename(descriptor), rename(signature), exceptions));
+            return new HttpMethodVisitor(api, null,
+                    cv.visitMethod(access, rename(name), rename(descriptor), rename(signature), exceptions));
         }
 
         @Override
@@ -143,8 +160,8 @@ public class CodeGenerator {
         @SuppressWarnings("unchecked")
         private <R> R invoke(Method method, Object... arguments) {
             try {
-                method.invoke(sink, Arrays.stream(arguments).map(this::rename).toArray());
-                return (R) method.invoke(cv, arguments);
+//                method.invoke(sink, Arrays.stream(arguments).map(this::rename).toArray());
+                return (R) method.invoke(cv, Arrays.stream(arguments).map(this::rename).toArray());
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
@@ -173,19 +190,19 @@ public class CodeGenerator {
 
         @Override
         public void visitEnd() {
-            source.visitEnd();
+            Optional.ofNullable(source).ifPresent(MethodVisitor::visitEnd);
             super.visitEnd();
         }
 
         @Override
         public void visitCode() {
-            source.visitCode();
+            Optional.ofNullable(source).ifPresent(MethodVisitor::visitCode);
             super.visitCode();
         }
 
         @Override
         public void visitInsn(int opcode) {
-            source.visitInsn(opcode);
+            Optional.ofNullable(source).ifPresent(it -> it.visitInsn(opcode));
             super.visitInsn(opcode);
         }
     }
