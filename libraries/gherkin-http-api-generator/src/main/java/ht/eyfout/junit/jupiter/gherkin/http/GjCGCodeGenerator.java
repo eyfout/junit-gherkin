@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-final public class CodeGenerator {
+final public class GjCGCodeGenerator {
     private static ClassReader asClassReader(Class<?> klass) {
         try {
             return new ClassReader(klass.getName());
