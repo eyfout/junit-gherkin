@@ -1,6 +1,6 @@
-package ht.eyfout.junit.jupiter.http;
+package ht.eyfout.junit.jupiter.gherkin.http;
 
-import ht.eyfout.junit.jupiter.http.generated.GjCGHttpAPI;
+import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGHttpAPI;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -9,6 +9,9 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class GjCodeGenerator {
+    public static int API = Opcodes.ASM7;
 
     private static Map<Class<?>, Class<?>> methodVisitors() {
         Map<Class<?>, Class<?>> visitors = new HashMap<>();
@@ -32,15 +36,21 @@ public class GjCodeGenerator {
         final Class<GjCGHttpAPI> api = GjCGHttpAPI.class;
         List<Operation> ops = paths.values().stream()
                 .flatMap(it -> it.readOperations().stream()).toList();
-        GjCGClassVisitor classVisitor = new GjCGClassVisitor(Opcodes.ASM7, List.of(ops.get(0)), api, methodVisitors());
+        GjCGClassVisitor classVisitor = new GjCGClassVisitor(API, List.of(ops.get(0)), api, new GjCGMethodVisitor(API));
         ClassReader classReader = getOrDefault(methods, api, GjCGClassVisitor::asClassReader);
         classReader.accept(classVisitor, Opcodes.V1_5);
+
         classVisitor.write((node, klass) -> {
-            return (ClassWriter) node;
-        }).map(it -> new String(it.toByteArray())).forEach(it -> {
-            System.out.println(it);
-            System.out.println();
-        });
+
+            File f = new File(new File("").getAbsolutePath(), "/build/" + klass.getSimpleName().replace(GjCGClassVisitor.PREFIX, node.name()) + ".class");
+            try {
+                f.createNewFile();
+                new FileOutputStream(f).write(((ClassWriter) node.klass()).toByteArray());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return f;
+        }).toList();
     }
 
     private static <K, V> V getOrDefault(Map<K, V> map, K key, Function<K, V> defaultValue) {

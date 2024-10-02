@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.http;
+package ht.eyfout.junit.jupiter.gherkin.http;
 
 import org.objectweb.asm.MethodVisitor;
 

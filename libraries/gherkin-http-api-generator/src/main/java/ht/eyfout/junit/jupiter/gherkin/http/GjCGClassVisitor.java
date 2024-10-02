@@ -1,14 +1,16 @@
-package ht.eyfout.junit.jupiter.http;
+package ht.eyfout.junit.jupiter.gherkin.http;
 
-import ht.eyfout.junit.jupiter.http.generated.GjCGHttpAPI;
-import ht.eyfout.junit.jupiter.http.generated.GjCGRequestBuilder;
+import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGHttpAPI;
+import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGRequestBuilder;
 import io.swagger.v3.oas.models.Operation;
 import org.objectweb.asm.*;
+import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,13 +20,13 @@ class GjCGClassVisitor extends ClassVisitor {
     final Class<?> klass;
     private final List<? extends Map.Entry<Operation, GherkinNode>> operations;
     private final Set<Type> visited = new HashSet<>();
-    private final Map<Class<?>, Class<?>> methodVisitors;
+    private final MethodVisitor methodVisitors;
 
     public GjCGClassVisitor(int api,
                             Collection<Operation> op,
                             Class<?> klass,
-                            Map<Class<?>, Class<?>> methodVisitors) {
-        super(api);
+                            MethodVisitor methodVisitors) {
+        super(api, new ClassWriter(asClassReader(klass), Opcodes.V1_5));
         List<GjCGClassVisitor> declared = Arrays.stream(klass.getDeclaredClasses()).map(inner -> {
             visited.add(Type.getType(inner));
             return new GjCGClassVisitor(api, op, inner, methodVisitors);
@@ -69,8 +71,7 @@ class GjCGClassVisitor extends ClassVisitor {
     }
 
     private static Map.Entry<Operation, GherkinNode> toEntry(int api, Operation op, List<GjCGClassVisitor> visitors) {
-
-        visitors.forEach(it ->{
+        visitors.forEach(it -> {
             asClassReader(it.klass).accept(it, Opcodes.V1_5);
         });
         return new AbstractMap.SimpleEntry<>(op,
@@ -94,10 +95,10 @@ class GjCGClassVisitor extends ClassVisitor {
 
     }
 
-    public <R> Stream<R> write(BiFunction<ClassVisitor, Class<?>, R> func) {
+    public <R> Stream<R> write(BiFunction<GherkinNode, Class<?>, R> func) {
         return recurse().flatMap(visitor ->
                 visitor.operations.stream().map(it ->
-                        func.apply(it.getValue().klass, visitor.klass)
+                        func.apply(it.getValue(), visitor.klass)
                 )
         );
     }
@@ -121,12 +122,10 @@ class GjCGClassVisitor extends ClassVisitor {
     }
 
     private void forEachOperation(Method method, Object... values) {
-        operations.forEach(op -> {
+        forEachOperation((operation, node) -> {
             try {
-                method.invoke(op.getValue().klass, convert(values, op.getValue().name));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+                method.invoke(node.klass, convert(values, node.name));
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -141,7 +140,6 @@ class GjCGClassVisitor extends ClassVisitor {
 
     @Override
     public void visitInnerClass(String name, String outerName, String innerName, int access) {
-//        forType(Type.getType("L" + name));
         forEachOperation(method("visitInnerClass", String.class, String.class, String.class, int.class), name, outerName, innerName, access);
         super.visitInnerClass(name, outerName, innerName, access);
     }
@@ -178,7 +176,6 @@ class GjCGClassVisitor extends ClassVisitor {
 
     @Override
     public void visitNestMember(String nestMember) {
-//        forType(Type.getType("L" + nestMember));
         forEachOperation(method("visitNestMember", String.class), nestMember);
         super.visitNestMember(nestMember);
     }
@@ -194,13 +191,32 @@ class GjCGClassVisitor extends ClassVisitor {
         Type methodType = Type.getMethodType(descriptor);
         forType(methodType.getReturnType());
         forType(methodType.getArgumentTypes());
-        return super.visitMethod(access, name, descriptor, signature, exceptions);
+        forEachOperation((operation, node) -> {
+            MethodNode mn = new MethodNode(access, name, replace(descriptor, node.name), replace(signature, node.name), exceptions);
+            if(name.equals("getDescription")){
+                mn.visitCode();
+                mn.visitLdcInsn(operation.getDescription());
+                mn.visitInsn(Opcodes.RETURN);
+                mn.visitEnd();
+            }
+
+
+            mn.accept(node.klass);
+        });
+
+        MethodVisitor visitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+        visitor.visitCode();
+        return visitor;
     }
 
     @Override
     public void visitPermittedSubclass(String permittedSubclass) {
         forEachOperation(method("visitPermittedSubclass", String.class), permittedSubclass);
         super.visitPermittedSubclass(permittedSubclass);
+    }
+
+    private void forEachOperation(BiConsumer<Operation, GherkinNode> consumer) {
+        operations.forEach(it -> consumer.accept(it.getKey(), it.getValue()));
     }
 
     private void forType(Type... type) {
@@ -217,13 +233,14 @@ class GjCGClassVisitor extends ClassVisitor {
     private void forClass(Class<?> klass) {
         if (klass.getPackage() == this.klass.getPackage()) {
             List<Operation> op = this.operations.stream().map(Map.Entry::getKey).toList();
-            this.operations.forEach(it -> {
+            forEachOperation((operation, node) -> {
                 GjCGClassVisitor ref = new GjCGClassVisitor(api, op, klass, this.methodVisitors);
-                it.getValue().inner.add(ref);
+                node.inner.add(ref);
                 asClassReader(klass).accept(ref, Opcodes.V1_5);
             });
         }
     }
 
-    record GherkinNode(ClassVisitor klass, String name, List<GjCGClassVisitor> inner) { }
+    record GherkinNode(ClassVisitor klass, String name, List<GjCGClassVisitor> inner) {
+    }
 }

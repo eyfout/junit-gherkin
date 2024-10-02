@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.http.generated;
+package ht.eyfout.junit.jupiter.gherkin.http.generated;
 
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI;
