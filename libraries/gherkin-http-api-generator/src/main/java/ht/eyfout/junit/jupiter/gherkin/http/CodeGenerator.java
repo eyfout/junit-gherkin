@@ -213,6 +213,11 @@ final public class CodeGenerator {
             }
 
             @Override
+            public void visitTypeInsn(int opcode, String type) {
+                super.visitTypeInsn(opcode, type.replace("GjCG", swagger.id()));
+            }
+
+            @Override
             public void visitLdcInsn(Object value) {
                 if(name.equals("getDescription")){
                     super.visitLdcInsn(swagger.description());
@@ -256,10 +261,6 @@ final public class CodeGenerator {
             super.visitFieldInsn(opcode, owner, name, descriptor);
         }
 
-        @Override
-        public void visitTypeInsn(int opcode, String type) {
-            super.visitTypeInsn(opcode, type);
-        }
 
         @Override
         public void visitEnd() {
