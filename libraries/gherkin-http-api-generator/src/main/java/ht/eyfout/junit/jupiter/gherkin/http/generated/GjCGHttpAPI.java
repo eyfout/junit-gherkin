@@ -2,14 +2,13 @@ package ht.eyfout.junit.jupiter.gherkin.http.generated;
 
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI;
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder;
 
 import java.util.Optional;
 
 public class GjCGHttpAPI<
-        H extends GjCGRequestBuilder.GjCGHeader,
-        P extends GjCGRequestBuilder.GjCGPath,
-        Q extends GjCGRequestBuilder.GjCGQuery> implements HttpAPI<GjCGRequestBuilder<H, P, Q>> {
+        H extends GjCGRequestBuilder.GjCGHeaderParam,
+        P extends GjCGRequestBuilder.GjCGPathParam,
+        Q extends GjCGRequestBuilder.GjCGQueryParam> implements HttpAPI<GjCGRequestBuilder<H, P, Q>> {
     @Override
     public String getHttpMethod() {
         return "";
@@ -22,7 +21,7 @@ public class GjCGHttpAPI<
 
     @Override
     public Optional<String> getDescription() {
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 
     @Override

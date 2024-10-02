@@ -54,10 +54,10 @@ public class GjCGClassVisitor extends ClassVisitor {
                     alt);
             return replaceSubtr(
                     replaceSubtr(
-                            replaceSubtr(value, GjCGRequestBuilder.GjCGPath.class, alt),
-                            GjCGRequestBuilder.GjCGQuery.class,
+                            replaceSubtr(value, GjCGRequestBuilder.GjCGPathParam.class, alt),
+                            GjCGRequestBuilder.GjCGQueryParam.class,
                             alt),
-                    GjCGRequestBuilder.GjCGHeader.class,
+                    GjCGRequestBuilder.GjCGHeaderParam.class,
                     alt);
         }
     }

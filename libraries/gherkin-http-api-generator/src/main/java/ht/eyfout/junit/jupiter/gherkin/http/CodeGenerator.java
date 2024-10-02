@@ -1,7 +1,7 @@
 package ht.eyfout.junit.jupiter.gherkin.http;
 
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI;
 import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGHttpAPI;
+import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGRequestBuilder;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -17,11 +17,12 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 final public class CodeGenerator {
     public static ClassReader asClassReader(Class<?> klass) {
         try {
-            return new ClassReader(GjCGHttpAPI.class.getName());
+            return new ClassReader(klass.getName());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -34,44 +35,63 @@ final public class CodeGenerator {
         Paths paths = openAPI.getPaths();
         paths.entrySet().stream().flatMap(path ->
                 path.getValue().readOperationsMap().entrySet().stream().map(it -> new SwaggerAPI(path.getKey(), it.getKey(), it.getValue()))
-        ).forEach(api -> {
-            Class<?> klass = GjCGHttpAPI.class;
-            ClassReader reader = asClassReader(klass);
-            ClassWriter source = new ClassWriter(reader, 0);
-            ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-            reader.accept(new HttpClassVisitor(
-                            Opcodes.ASM7,
-                            source,
-                            sink,
-                            it -> {
-                                if (it != null) {
-                                    return it.replace("GjCG", api.id());
-                                }
-                                return it;
-                            }, (name, descriptor, it) -> new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it,api,name, descriptor)
-                    ),
-                    0);
+        ).forEach(api ->
+                Stream.of(GjCGHttpAPI.class, GjCGRequestBuilder.class)
+                        .flatMap(it -> Stream.concat(Stream.of(it), Arrays.stream(it.getDeclaredClasses())))
+                        .forEach(klass -> {
+                            int dot = klass.getName().lastIndexOf('.');
+                            String fName = klass.getName().substring(dot + 1).replace("GjCG", api.id()) + ".class";
 
-            int dot = klass.getName().lastIndexOf(".");
-            File pkg = new File(rootDir, klass.getName().substring(0, dot).replace('.', '/') + "/");
-            pkg.mkdirs();
-            File file = new File(pkg, klass.getName().substring(dot + 1).replace("GjCG", api.id()) + ".class");
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            try (FileOutputStream os = new FileOutputStream(file)) {
-                os.write(sink.toByteArray());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+                            createFile(rootDir, fName, klass, generate(klass, api));
+                        })
+        );
     }
 
+    static void createFile(File rootDir, String fName, Class<?> klass, byte[] content) {
+        int dot = klass.getName().lastIndexOf(".");
+        File pkg = new File(rootDir, klass.getName().substring(0, dot).replace('.', '/') + "/");
+        pkg.mkdirs();
+        File file = new File(pkg, fName);
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (FileOutputStream os = new FileOutputStream(file)) {
+            os.write(content);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    static byte[] generate(Class<?> klass, SwaggerAPI api) {
+        ClassReader reader = asClassReader(klass);
+        ClassWriter source = new ClassWriter(reader, 0);
+        ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        reader.accept(new HttpClassVisitor(
+                        Opcodes.ASM7,
+                        source,
+                        sink,
+                        it -> {
+                            if (it != null) {
+                                return it.replace("GjCG", api.id());
+                            }
+                            return it;
+                        }, (name, descriptor, it) -> {
+                    if (klass == GjCGHttpAPI.class) {
+                        return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
+                    } else {
+                        return new HttpMethodVisitor(Opcodes.ASM7, null, it);
+                    }
+                }),
+                0);
+        return sink.toByteArray();
+    }
+
+
     final static class HttpClassVisitor extends ClassVisitor {
-        //                private final ClassVisitor source;
         private final ClassVisitor sink;
         private final Function<String, String> rebrand;
         private final TriFunction<String, String, MethodVisitor, MethodVisitor> methodVisitor;
@@ -219,13 +239,13 @@ final public class CodeGenerator {
 
             @Override
             public void visitLdcInsn(Object value) {
-                if(name.equals("getDescription")){
+                if (name.equals("getDescription")) {
                     super.visitLdcInsn(swagger.description());
-                } else if(name.equals("getHttpMethod")){
+                } else if (name.equals("getHttpMethod")) {
                     super.visitLdcInsn(swagger.httpMethod());
-                } else if(name.equals("getBasePath")){
+                } else if (name.equals("getBasePath")) {
                     super.visitLdcInsn(swagger.path());
-                }else{
+                } else {
                     super.visitLdcInsn(value);
                 }
             }
