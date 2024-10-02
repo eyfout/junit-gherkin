@@ -13,7 +13,7 @@ record SwaggerAPI(String path, PathItem.HttpMethod method, Operation operation) 
 
     public String id() {
         String operationID = operation.getOperationId();
-        if(operationID.toLowerCase().startsWith(method.name().toLowerCase())){
+        if (operationID.toLowerCase().startsWith(method.name().toLowerCase())) {
             operationID = operationID.substring(method.name().length());
         }
         return httpMethod() + operationID;

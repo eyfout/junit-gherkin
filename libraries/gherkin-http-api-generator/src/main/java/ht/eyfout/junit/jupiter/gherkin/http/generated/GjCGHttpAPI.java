@@ -26,6 +26,6 @@ public class GjCGHttpAPI<
 
     @Override
     public GjCGRequestBuilder<H, P, Q> builder(GivenState givenState) {
-        return new GjCGRequestBuilder<>( this, givenState);
+        return new GjCGRequestBuilder<>(this, givenState);
     }
 }
