@@ -1,5 +1,6 @@
 package ht.eyfout.junit.jupiter.gherkin.http;
 
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder;
 import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGHttpAPI;
 import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGRequestBuilder;
 import io.swagger.parser.OpenAPIParser;
@@ -29,7 +30,7 @@ final public class CodeGenerator {
         }
     }
 
-    static String firstUpper(String it) {
+    static String camelCase(String it) {
         return it.toUpperCase().substring(0, 1) + it.substring(1);
     }
 
@@ -54,32 +55,81 @@ final public class CodeGenerator {
                         .forEach(klass -> {
                             int dot = klass.getName().lastIndexOf('.');
                             String fName = klass.getName().substring(dot + 1).replace("GjCG", api.id()) + ".class";
-                            byte[] content;
+                            byte[] content = generate(klass, api, it -> replace(it, api.id()));
                             if (paramType.contains(klass)) {
-                                content = generateParam(klass, api, it -> replace(it, api.id()));
-                            } else {
-                                content = generate(klass, api, it -> replace(it, api.id()));
+                                content = with(klass, content, api);
                             }
                             createFile(rootDir, fName, klass, content);
                         })
         );
     }
 
-    static byte[] with(Class<?> klass, byte[] content, SwaggerAPI api) {
-        ClassWriter writer = new ClassWriter(new ClassReader(content), 0);
-        Optional.ofNullable(api.operation().getParameters()).ifPresent(params -> {
-            params.stream()
-                    .filter(it -> it.getIn() != null && it.getName() != null)
-                    .filter(it -> klass.getName().contains(it.getIn()))
-                    .forEach(it -> {
-                        MethodVisitor mv = writer.visitMethod(Opcodes.ACC_PUBLIC,
-                                "set" + firstUpper(it.getName()),
-                                Type.getMethodDescriptor(Type.getType(Void.class), Type.getType(String.class)),
-                                null,
-                                null);
-                    });
+    static class ParamClassVisitor extends ClassVisitor {
+        private static final Map<String, String> api = Map.of(
+                "path", "pathParam",
+                "header", "header",
+                "query", "queryParam"
+        );
+        private final Collection<Pair<String, String>> params;
+        private String vistingClassName;
+        private String builderType;
 
+        ParamClassVisitor(int api, ClassVisitor cv, Collection<Pair<String, String>> params) {
+            super(api, cv);
+            this.params = params;
+        }
+
+        @Override
+        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+            vistingClassName = name;
+            super.visit(version, access, name, signature, superName, interfaces);
+        }
+
+        @Override
+        public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+            if(name.contains("builder")){
+                builderType = descriptor;
+            }
+            return super.visitField(access, name, descriptor, signature, value);
+        }
+
+        @Override
+        public void visitEnd() {
+            String owner = Type.getType(HttpAPIRequestBuilder.class).getInternalName();
+            String descriptor = Type.getMethodDescriptor(Type.getType(void.class), Type.getType(String.class), Type.getType(String.class));
+
+            params.forEach(it -> {
+                MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
+                        "set" + camelCase(it.second()),
+                        Type.getMethodDescriptor(Type.getType(void.class), Type.getType(String.class)),
+                        null,
+                        null);
+                mv.visitCode();
+                mv.visitVarInsn(Opcodes.ALOAD, 0);
+                mv.visitFieldInsn(Opcodes.GETFIELD,vistingClassName,"builder", builderType );
+                mv.visitLdcInsn(it.second());
+                mv.visitVarInsn(Opcodes.ILOAD, 1);
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner,
+                        api.get(it.first().toLowerCase()),
+                        descriptor, false);
+                mv.visitEnd();
+            });
+            super.visitEnd();
+        }
+    }
+
+    static byte[] with(Class<?> klass, byte[] content, SwaggerAPI api) {
+        ClassReader reader = new ClassReader(content);
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        Collection<Pair<String, String>> parameterPairs = new ArrayList<>();
+        Optional.ofNullable(api.operation().getParameters()).ifPresent(params -> {
+            List<Pair<String, String>> pairs = params.stream()
+                    .filter(it -> it.getIn() != null && it.getName() != null)
+                    .filter(it -> klass.getName().contains(camelCase(it.getIn())))
+                    .map(it -> new Pair<>(it.getIn(), it.getName())).toList();
+            parameterPairs.addAll(pairs);
         });
+        reader.accept(new ParamClassVisitor(Opcodes.ASM7, writer, parameterPairs), ClassWriter.COMPUTE_FRAMES);
         return writer.toByteArray();
     }
 
@@ -172,6 +222,14 @@ final public class CodeGenerator {
 
             @Override
             public void visitEnd() {
+                params.forEach(it -> {
+                    visitMethod(Opcodes.ACC_PUBLIC,
+                            "set" + it.second(),
+                            Type.getMethodDescriptor(Type.getType(Void.class), Type.getType(String.class)),
+                            null,
+                            null
+                    );
+                });
 
                 super.visitEnd();
             }
