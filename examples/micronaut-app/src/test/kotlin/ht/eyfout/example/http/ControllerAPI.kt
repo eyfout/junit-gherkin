@@ -1,6 +1,6 @@
 package ht.eyfout.example.http
 
-import ht.eyfout.junit.jupiter.api.http.HttpEndpoint
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpEndpoint
 import java.util.*
 
 enum class ControllerAPI : HttpEndpoint {

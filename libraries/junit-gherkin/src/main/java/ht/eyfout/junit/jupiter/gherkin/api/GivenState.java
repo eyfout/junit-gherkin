@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.api;
+package ht.eyfout.junit.jupiter.gherkin.api;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package ht.eyfout.example.http
 
 import ht.eyfout.example.client.DMVClient
-import ht.eyfout.junit.jupiter.api.http.HttpAPIStateScopeProvider
-import ht.eyfout.junit.jupiter.api.http.HttpAPIThenScope
-import ht.eyfout.junit.jupiter.api.http.HttpAPIWhenScope
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIStateScopeProvider
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIThenScope
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIWhenScope
 import jakarta.inject.Singleton
 
 @Singleton

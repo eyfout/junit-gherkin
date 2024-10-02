@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.api;
+package ht.eyfout.junit.jupiter.gherkin.api;
 
 public abstract class ThenScope implements ImmutableScope, WhenScopeExecutor {
     protected final WhenScopeExecutor executor;

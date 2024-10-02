@@ -1,16 +1,13 @@
-package ht.eyfout.junit.jupiter.api.http;
+package ht.eyfout.junit.jupiter.gherkin.api.http;
 
-import ht.eyfout.junit.jupiter.api.GivenState;
-import ht.eyfout.junit.jupiter.api.WhenScopeExecutor;
+import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
+import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.net.ConnectException;
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.api;
+package ht.eyfout.junit.jupiter.gherkin.api;
 
 public interface StateScopeProvider<Given extends GivenState, When extends WhenScope, Then extends ThenScope> {
     Given givenState();

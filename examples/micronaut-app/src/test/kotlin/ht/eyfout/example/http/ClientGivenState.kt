@@ -3,7 +3,7 @@ package ht.eyfout.example.http
 import ht.eyfout.example.client.DMVClient
 import ht.eyfout.example.client.Vehicle
 import ht.eyfout.example.client.VehicleManufacturer
-import ht.eyfout.junit.jupiter.api.GivenState
+import ht.eyfout.junit.jupiter.gherkin.api.GivenState
 import io.micronaut.http.HttpResponse
 import io.mockk.every
 

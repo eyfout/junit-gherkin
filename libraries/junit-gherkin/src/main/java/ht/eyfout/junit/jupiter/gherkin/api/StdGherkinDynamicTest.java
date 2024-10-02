@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.api;
+package ht.eyfout.junit.jupiter.gherkin.api;
 
 import org.junit.jupiter.api.DynamicTest;
 

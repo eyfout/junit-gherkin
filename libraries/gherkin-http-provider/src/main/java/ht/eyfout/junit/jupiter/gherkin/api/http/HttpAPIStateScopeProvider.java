@@ -1,8 +1,8 @@
-package ht.eyfout.junit.jupiter.api.http;
+package ht.eyfout.junit.jupiter.gherkin.api.http;
 
-import ht.eyfout.junit.jupiter.api.GivenState;
-import ht.eyfout.junit.jupiter.api.StateScopeProvider;
-import ht.eyfout.junit.jupiter.api.WhenScopeExecutor;
+import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
+import ht.eyfout.junit.jupiter.gherkin.api.StateScopeProvider;
+import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 
 public abstract class HttpAPIStateScopeProvider<Given extends GivenState, When extends HttpAPIWhenScope, Then extends HttpAPIThenScope> implements StateScopeProvider<Given, When, Then> {
     public HttpAPIStateScopeProvider() {

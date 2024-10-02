@@ -3,7 +3,7 @@ package ht.eyfout.example
 import ht.eyfout.example.client.DMVClient
 import ht.eyfout.example.http.ControllerAPI
 import ht.eyfout.example.http.ExampleStateScopeProvider
-import ht.eyfout.junit.jupiter.api.GherkinDynamicTest
+import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.annotation.MockBean
