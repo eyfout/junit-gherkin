@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -105,7 +103,7 @@ final public class CodeGenerator {
 
 
     static byte[] generate(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
-        return generate(klass, api, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
+        return generate(klass, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
                         (name, descriptor, it) -> {
                             if (klass == GjCGHttpAPI.class) {
                                 return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
@@ -117,7 +115,9 @@ final public class CodeGenerator {
 
     }
 
-    static byte[] generate(Class<?> klass, SwaggerAPI api, BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor, Function<String, String> rename) {
+    static byte[] generate(Class<?> klass,
+                           BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor,
+                           Function<String, String> rename) {
         ClassReader reader = asClassReader(klass);
         ClassWriter source = new ClassWriter(reader, 0);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -127,20 +127,22 @@ final public class CodeGenerator {
 
 
     static byte[] generateParam(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
-        return generate(klass, api, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
-                        (name, descriptor, it) -> {
-                            if (klass == GjCGHttpAPI.class) {
-                                return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
-                            } else {
-                                return new HttpMethodVisitor(Opcodes.ASM7, null, it);
-                            }
-                        })
+        List<Pair<String, String>> params = new ArrayList<>();
+        Optional.ofNullable(api.operation().getParameters()).ifPresent(p -> {
+            params.addAll(p.stream()
+                    .filter(it -> it.getIn() != null && it.getName() != null)
+                    .filter(it -> klass.getName().contains(it.getIn()))
+                    .map(it -> new Pair<>(it.getIn(), it.getName())).toList());
+        });
+        return generate(klass, (source, sink) -> new HttpClassVisitor.HttpParamClassVisitor(Opcodes.ASM7, source, sink, rename,
+                        (name, descriptor, it) -> new HttpMethodVisitor(Opcodes.ASM7, null, it),
+                        params)
                 , rename);
     }
 
 
-    final static class HttpClassVisitor extends ClassVisitor {
-        private final ClassVisitor sink;
+    static class HttpClassVisitor extends ClassVisitor {
+
         private final Function<String, String> rebrand;
         private final TriFunction<String, String, MethodVisitor, MethodVisitor> methodVisitor;
 
@@ -150,9 +152,29 @@ final public class CodeGenerator {
                                 Function<String, String> rebrand,
                                 TriFunction<String, String, MethodVisitor, MethodVisitor> methodVisitor) {
             super(api, sink);
-            this.sink = sink;
             this.rebrand = rebrand;
             this.methodVisitor = methodVisitor;
+        }
+
+        static class HttpParamClassVisitor extends HttpClassVisitor {
+
+            private final List<Pair<String, String>> params;
+
+            public HttpParamClassVisitor(int api,
+                                         ClassVisitor source,
+                                         ClassVisitor sink,
+                                         Function<String, String> rebrand,
+                                         TriFunction<String, String, MethodVisitor, MethodVisitor> methodVisitor,
+                                         List<Pair<String, String>> params) {
+                super(api, source, sink, rebrand, methodVisitor);
+                this.params = params;
+            }
+
+            @Override
+            public void visitEnd() {
+
+                super.visitEnd();
+            }
         }
 
         @Override
