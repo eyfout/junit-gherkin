@@ -16,11 +16,14 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final public class CodeGenerator {
-    public static ClassReader asClassReader(Class<?> klass) {
+    static ClassReader asClassReader(Class<?> klass) {
         try {
             return new ClassReader(klass.getName());
         } catch (IOException e) {
@@ -28,12 +31,24 @@ final public class CodeGenerator {
         }
     }
 
+    static String firstUpper(String it) {
+        return it.toUpperCase().substring(0, 1) + it.substring(1);
+    }
+
+    static String replace(String it, String other) {
+        if (it != null) {
+            return it.replace("GjCG", other);
+        }
+        return it;
+    }
+
     static public void generate(URL in) {
+        Set<Class<?>> paramType = Arrays.stream(GjCGRequestBuilder.class.getDeclaredClasses()).collect(Collectors.toSet());
         File rootDir = new File(new File("").getAbsolutePath(), "/build/generated/classes");
         OpenAPI openAPI = new OpenAPIParser().readLocation(in.toString(), null, null)
                 .getOpenAPI();
         Paths paths = openAPI.getPaths();
-        paths.entrySet().stream().flatMap(path ->
+        paths.entrySet().stream().parallel().flatMap(path ->
                 path.getValue().readOperationsMap().entrySet().stream().map(it -> new SwaggerAPI(path.getKey(), it.getKey(), it.getValue()))
         ).forEach(api ->
                 Stream.of(GjCGHttpAPI.class, GjCGRequestBuilder.class)
@@ -41,16 +56,33 @@ final public class CodeGenerator {
                         .forEach(klass -> {
                             int dot = klass.getName().lastIndexOf('.');
                             String fName = klass.getName().substring(dot + 1).replace("GjCG", api.id()) + ".class";
-                            byte[] content = generate(klass, api, it -> {
-                                if (it != null) {
-                                    return it.replace("GjCG", api.id());
-                                }
-                                return it;
-                            });
-
+                            byte[] content;
+                            if (paramType.contains(klass)) {
+                                content = generateParam(klass, api, it -> replace(it, api.id()));
+                            } else {
+                                content = generate(klass, api, it -> replace(it, api.id()));
+                            }
                             createFile(rootDir, fName, klass, content);
                         })
         );
+    }
+
+    static byte[] with(Class<?> klass, byte[] content, SwaggerAPI api) {
+        ClassWriter writer = new ClassWriter(new ClassReader(content), 0);
+        Optional.ofNullable(api.operation().getParameters()).ifPresent(params -> {
+            params.stream()
+                    .filter(it -> it.getIn() != null && it.getName() != null)
+                    .filter(it -> klass.getName().contains(it.getIn()))
+                    .forEach(it -> {
+                        MethodVisitor mv = writer.visitMethod(Opcodes.ACC_PUBLIC,
+                                "set" + firstUpper(it.getName()),
+                                Type.getMethodDescriptor(Type.getType(Void.class), Type.getType(String.class)),
+                                null,
+                                null);
+                    });
+
+        });
+        return writer.toByteArray();
     }
 
     static void createFile(File rootDir, String fName, Class<?> klass, byte[] content) {
@@ -73,22 +105,37 @@ final public class CodeGenerator {
 
 
     static byte[] generate(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
+        return generate(klass, api, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
+                        (name, descriptor, it) -> {
+                            if (klass == GjCGHttpAPI.class) {
+                                return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
+                            } else {
+                                return new HttpMethodVisitor(Opcodes.ASM7, null, it);
+                            }
+                        })
+                , rename);
+
+    }
+
+    static byte[] generate(Class<?> klass, SwaggerAPI api, BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor, Function<String, String> rename) {
         ClassReader reader = asClassReader(klass);
         ClassWriter source = new ClassWriter(reader, 0);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        reader.accept(new HttpClassVisitor(
-                        Opcodes.ASM7,
-                        source,
-                        sink,
-                        rename, (name, descriptor, it) -> {
-                    if (klass == GjCGHttpAPI.class) {
-                        return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
-                    } else {
-                        return new HttpMethodVisitor(Opcodes.ASM7, null, it);
-                    }
-                }),
-                0);
+        reader.accept(visitor.apply(source, sink), 0);
         return sink.toByteArray();
+    }
+
+
+    static byte[] generateParam(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
+        return generate(klass, api, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
+                        (name, descriptor, it) -> {
+                            if (klass == GjCGHttpAPI.class) {
+                                return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
+                            } else {
+                                return new HttpMethodVisitor(Opcodes.ASM7, null, it);
+                            }
+                        })
+                , rename);
     }
 
 
@@ -103,7 +150,6 @@ final public class CodeGenerator {
                                 Function<String, String> rebrand,
                                 TriFunction<String, String, MethodVisitor, MethodVisitor> methodVisitor) {
             super(api, sink);
-//            this.source = source;
             this.sink = sink;
             this.rebrand = rebrand;
             this.methodVisitor = methodVisitor;
