@@ -5,3 +5,4 @@ include(":libraries:gherkin-http-provider")
 include(":libraries:gherkin-http-api-generator")
 
 include(":examples:micronaut-app")
+include(":plugins")

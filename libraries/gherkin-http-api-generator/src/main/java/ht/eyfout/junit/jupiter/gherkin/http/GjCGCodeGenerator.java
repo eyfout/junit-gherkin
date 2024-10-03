@@ -36,37 +36,43 @@ final public class GjCGCodeGenerator {
         return it.toUpperCase().charAt(0) + it.substring(1);
     }
 
-    static String replace(String it, String other) {
+    static String replace(String namespace, String it, String other) {
         if (it != null) {
-            return it.replace("GjCG", other);
+            int index = it.indexOf("GjCG");
+            String str = it.replace("GjCG", other);
+            if (index > 0) {
+                char delimiter = str.charAt(index - 1);
+                str = str.substring(0, index - 1) + delimiter + namespace + delimiter + str.substring(index);
+            }
+            return str;
         }
         return it;
     }
 
-    static public void generate(URL in) {
+    static public void generate(URL in, File rootDir, String namespace) {
         Set<Class<?>> paramType = Arrays.stream(GjCGRequestBuilder.class.getDeclaredClasses()).collect(Collectors.toSet());
-        File rootDir = new File(new File("").getAbsolutePath(), "/build/generated/classes");
         OpenAPI openAPI = new OpenAPIParser().readLocation(in.toString(), null, null)
                 .getOpenAPI();
         Paths paths = openAPI.getPaths();
         paths.entrySet().stream().parallel().flatMap(path ->
                 path.getValue().readOperationsMap().entrySet().stream().map(it -> new SwaggerAPI(path.getKey(), it.getKey(), it.getValue()))
-        ).forEach(api ->
-                Stream.of(GjCGHttpAPI.class, GjCGRequestBuilder.class)
-                        .flatMap(it -> Stream.concat(Stream.of(it), Arrays.stream(it.getDeclaredClasses())))
-                        .forEach(klass -> {
-                            int dot = klass.getName().lastIndexOf('.');
-                            String fName = klass.getName().substring(dot + 1).replace("GjCG", api.id()) + ".class";
-                            byte[] content = generate(klass, api, it -> replace(it, api.id()));
-                            if (paramType.contains(klass)) {
-                                content = with(klass, content, api);
-                            }
-                            createFile(rootDir, fName, klass, content);
-                        })
-        );
+        ).forEach(api -> {
+            final Function<String, String> rename = it -> replace(namespace, it, api.id());
+            Stream.of(GjCGHttpAPI.class, GjCGRequestBuilder.class)
+                    .flatMap(it -> Stream.concat(Stream.of(it), Arrays.stream(it.getDeclaredClasses())))
+                    .forEach(klass -> {
+                        int dot = klass.getName().lastIndexOf('.');
+                        String fName = rename.apply(klass.getName().substring(dot + 1)) + ".class";
+                        byte[] content = generate(klass, api, rename);
+                        if (paramType.contains(klass)) {
+                            content = with(klass, content, api, rename);
+                        }
+                        createFile(rootDir, namespace, fName, klass, content);
+                    });
+        });
     }
 
-    private static byte[] with(Class<?> klass, byte[] content, SwaggerAPI api) {
+    private static byte[] with(Class<?> klass, byte[] content, SwaggerAPI api, Function<String, String> rename) {
         ClassReader reader = new ClassReader(content);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         Collection<Parameter> parameterPairs = new ArrayList<>();
@@ -77,15 +83,15 @@ final public class GjCGCodeGenerator {
                     .toList();
             parameterPairs.addAll(pairs);
         });
-        reader.accept(new ParamClassVisitor(Opcodes.ASM7, writer, parameterPairs), ClassWriter.COMPUTE_FRAMES);
+        reader.accept(new ParamClassVisitor(Opcodes.ASM7, writer, parameterPairs, rename), ClassWriter.COMPUTE_FRAMES);
         return writer.toByteArray();
     }
 
-    private static void createFile(File rootDir, String fName, Class<?> klass, byte[] content) {
+    private static void createFile(File rootDir, String namespace, String fName, Class<?> klass, byte[] content) {
         int dot = klass.getName().lastIndexOf(".");
-        File pkg = new File(rootDir, klass.getName().substring(0, dot).replace('.', '/') + "/");
-        pkg.mkdirs();
-        File file = new File(pkg, fName);
+        File packageDir = new File(new File(rootDir, klass.getName().substring(0, dot).replace('.', File.separatorChar) + File.separator), namespace);
+        packageDir.mkdirs();
+        File file = new File(packageDir, fName);
         try {
             file.createNewFile();
         } catch (IOException e) {
@@ -101,20 +107,19 @@ final public class GjCGCodeGenerator {
 
     private static byte[] generate(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
         return generate(klass, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
-                        (name, descriptor, it) -> {
-                            if (klass == GjCGHttpAPI.class) {
-                                return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, descriptor);
-                            } else {
-                                return new HttpMethodVisitor(Opcodes.ASM7, null, it);
-                            }
-                        })
-                , rename);
+                (name, descriptor, it) -> {
+                    if (klass == GjCGHttpAPI.class) {
+                        return new HttpMethodVisitor.APIMethodVisitor(Opcodes.ASM7, null, it, api, name, rename);
+                    } else {
+                        return new HttpMethodVisitor(Opcodes.ASM7, null, it);
+                    }
+                })
+        );
 
     }
 
     private static byte[] generate(Class<?> klass,
-                                   BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor,
-                                   Function<String, String> rename) {
+                                   BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor) {
         ClassReader reader = asClassReader(klass);
         ClassWriter source = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -129,24 +134,27 @@ final public class GjCGCodeGenerator {
                 "query", "queryParam"
         );
         private final Collection<Parameter> params;
-        private String vistingClassName;
-        private String builderType;
+        private String className;
+        private Pair<String, String> builderField;
+        private final String builderClass;
 
-        ParamClassVisitor(int api, ClassVisitor cv, Collection<Parameter> params) {
+
+        ParamClassVisitor(int api, ClassVisitor cv, Collection<Parameter> params, Function<String, String> rename) {
             super(api, cv);
             this.params = params;
+            builderClass = rename.apply(Type.getType(HttpAPIRequestBuilder.class).getInternalName());
         }
 
         @Override
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-            vistingClassName = name;
+            className = name;
             super.visit(version, access, name, signature, superName, interfaces);
         }
 
         @Override
         public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-            if (name.contains("builder")) {
-                builderType = descriptor;
+            if (descriptor.contains(builderClass)) {
+                builderField = new Pair<>(descriptor, name);
             }
             return super.visitField(access, name, descriptor, signature, value);
         }
@@ -174,7 +182,7 @@ final public class GjCGCodeGenerator {
         @Override
         public void visitEnd() {
             String owner = Type.getType(HttpAPIRequestBuilder.class).getInternalName();
-            String descriptor = Type.getMethodDescriptor(Type.getType(void.class), Type.getType(String.class), Type.getType(String.class));
+            String descriptor = Type.getMethodDescriptor(Type.getType(void.class), Type.getType(String.class), Type.getType(Object.class));
 
             params.forEach(it -> {
                 MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
@@ -182,10 +190,12 @@ final public class GjCGCodeGenerator {
                         Type.getMethodDescriptor(Type.getType(void.class), Type.getType(type(it.getSchema()))),
                         null,
                         null);
+                String name = it.getName().replace('-', '_');
                 mv.visitCode();
+                mv.visitParameter(name, Opcodes.ACC_SYNTHETIC);
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
-                mv.visitFieldInsn(Opcodes.GETFIELD, vistingClassName, "builder", builderType);
-                mv.visitLdcInsn(it.getName());
+                mv.visitFieldInsn(Opcodes.GETFIELD, className, builderField.second(), builderField.first());
+                mv.visitLdcInsn(name);
                 mv.visitVarInsn(Opcodes.ILOAD, 1);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner,
                         api.get(it.getIn().toLowerCase()),
@@ -369,22 +379,22 @@ final public class GjCGCodeGenerator {
         static private class APIMethodVisitor extends HttpMethodVisitor {
             private final SwaggerAPI swagger;
             private final String name;
-            private final String descriptor;
+            private final Function<String, String> rename;
 
             public APIMethodVisitor(int api, MethodVisitor source,
                                     MethodVisitor sink,
                                     SwaggerAPI swagger,
                                     String name,
-                                    String descriptor) {
+                                    Function<String, String> rename) {
                 super(api, source, sink);
                 this.swagger = swagger;
                 this.name = name;
-                this.descriptor = descriptor;
+                this.rename = rename;
             }
 
             @Override
             public void visitTypeInsn(int opcode, String type) {
-                super.visitTypeInsn(opcode, type.replace("GjCG", swagger.id()));
+                super.visitTypeInsn(opcode, rename.apply(type));
             }
 
             @Override
