@@ -5,7 +5,7 @@ import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder;
 
 import java.util.function.Consumer;
 
-public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderParam,
+final public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderParam,
         P extends GjCGRequestBuilder.GjCGPathParam,
         Q extends GjCGRequestBuilder.GjCGQueryParam> extends HttpAPIRequestBuilder {
     public GjCGRequestBuilder(GjCGHttpAPI<H, P, Q> api, GivenState givenState) {
@@ -27,7 +27,7 @@ public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderParam,
         return this;
     }
 
-    static public class GjCGHeaderParam {
+    final static public class GjCGHeaderParam {
         private final HttpAPIRequestBuilder builder;
 
         public GjCGHeaderParam(HttpAPIRequestBuilder builder) {
@@ -35,7 +35,7 @@ public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderParam,
         }
     }
 
-    static public class GjCGQueryParam {
+    final static public class GjCGQueryParam {
         private final HttpAPIRequestBuilder builder;
 
         public GjCGQueryParam(HttpAPIRequestBuilder builder) {
@@ -43,7 +43,7 @@ public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderParam,
         }
     }
 
-    static public class GjCGPathParam {
+    final static public class GjCGPathParam {
         private final HttpAPIRequestBuilder builder;
 
         public GjCGPathParam(HttpAPIRequestBuilder builder) {

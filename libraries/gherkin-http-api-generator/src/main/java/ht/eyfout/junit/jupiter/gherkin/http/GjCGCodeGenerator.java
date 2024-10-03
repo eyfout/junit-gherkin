@@ -114,7 +114,7 @@ final public class GjCGCodeGenerator {
                                    BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor,
                                    Function<String, String> rename) {
         ClassReader reader = asClassReader(klass);
-        ClassWriter source = new ClassWriter(reader, 0);
+        ClassWriter source = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         reader.accept(visitor.apply(source, sink), 0);
         return sink.toByteArray();
