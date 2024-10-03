@@ -12,16 +12,19 @@ final public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderPar
         super(api, givenState);
     }
 
+    @SuppressWarnings("unchecked")
     public GjCGRequestBuilder<H, P, Q> header(Consumer<H> consumer) {
         consumer.accept((H) new GjCGHeaderParam(this));
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public GjCGRequestBuilder<H, P, Q> pathParams(Consumer<P> consumer) {
         consumer.accept((P) new GjCGPathParam(this));
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public GjCGRequestBuilder<H, P, Q> queryParams(Consumer<Q> consumer) {
         consumer.accept((Q) new GjCGQueryParam(this));
         return this;

@@ -1,3 +1,15 @@
+plugins{
+    id 'maven-publish'
+}
+
 repositories {
     mavenCentral()
+    mavenLocal()
+}
+
+subprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
 }

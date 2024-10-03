@@ -18,17 +18,17 @@ public class HttpAPIRequestBuilder {
         this.givenState = Optional.ofNullable(givenState);
     }
 
-    public HttpAPIRequestBuilder header(String key, String value) {
+    public HttpAPIRequestBuilder header(String key, Object value) {
         headers.put(key, value);
         return this;
     }
 
-    public HttpAPIRequestBuilder queryParam(String key, String value) {
+    public HttpAPIRequestBuilder queryParam(String key, Object value) {
         queryParams.put(key, value);
         return this;
     }
 
-    public HttpAPIRequestBuilder pathParam(String key, String value) {
+    public HttpAPIRequestBuilder pathParam(String key, Object value) {
         pathParams.put(key, value);
         return this;
     }
