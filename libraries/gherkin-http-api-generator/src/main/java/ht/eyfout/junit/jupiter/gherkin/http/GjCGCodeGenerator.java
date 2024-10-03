@@ -50,6 +50,11 @@ final public class GjCGCodeGenerator {
     }
 
     static public void generate(URL in, File rootDir, String namespace) {
+        Objects.requireNonNull(in);
+        Objects.requireNonNull(rootDir);
+        Objects.requireNonNull(namespace);
+
+        final String ns = namespace.toLowerCase();
         Set<Class<?>> paramType = Arrays.stream(GjCGRequestBuilder.class.getDeclaredClasses()).collect(Collectors.toSet());
         OpenAPI openAPI = new OpenAPIParser().readLocation(in.toString(), null, null)
                 .getOpenAPI();
@@ -57,7 +62,7 @@ final public class GjCGCodeGenerator {
         paths.entrySet().stream().parallel().flatMap(path ->
                 path.getValue().readOperationsMap().entrySet().stream().map(it -> new SwaggerAPI(path.getKey(), it.getKey(), it.getValue()))
         ).forEach(api -> {
-            final Function<String, String> rename = it -> replace(namespace, it, api.id());
+            final Function<String, String> rename = it -> replace(ns, it, api.id());
             Stream.of(GjCGHttpAPI.class, GjCGRequestBuilder.class)
                     .flatMap(it -> Stream.concat(Stream.of(it), Arrays.stream(it.getDeclaredClasses())))
                     .forEach(klass -> {
@@ -67,7 +72,7 @@ final public class GjCGCodeGenerator {
                         if (paramType.contains(klass)) {
                             content = with(klass, content, api, rename);
                         }
-                        createFile(rootDir, namespace, fName, klass, content);
+                        createFile(rootDir, ns, fName, klass, content);
                     });
         });
     }
@@ -115,7 +120,6 @@ final public class GjCGCodeGenerator {
                     }
                 })
         );
-
     }
 
     private static byte[] generate(Class<?> klass,
@@ -378,8 +382,9 @@ final public class GjCGCodeGenerator {
 
         static private class APIMethodVisitor extends HttpMethodVisitor {
             private final SwaggerAPI swagger;
-            private final String name;
+            private final String methodName;
             private final Function<String, String> rename;
+            private final String optionalClass = Type.getType(Optional.class).getInternalName();
 
             public APIMethodVisitor(int api, MethodVisitor source,
                                     MethodVisitor sink,
@@ -388,8 +393,9 @@ final public class GjCGCodeGenerator {
                                     Function<String, String> rename) {
                 super(api, source, sink);
                 this.swagger = swagger;
-                this.name = name;
+                this.methodName = name;
                 this.rename = rename;
+
             }
 
             @Override
@@ -399,14 +405,24 @@ final public class GjCGCodeGenerator {
 
             @Override
             public void visitLdcInsn(Object value) {
-                if (name.equals("getDescription")) {
+                if (methodName.equals("getDescription")) {
                     super.visitLdcInsn(swagger.description());
-                } else if (name.equals("getHttpMethod")) {
+                } else if (methodName.equals("getHttpMethod")) {
                     super.visitLdcInsn(swagger.httpMethod());
-                } else if (name.equals("getBasePath")) {
+                } else if (methodName.equals("getBasePath")) {
                     super.visitLdcInsn(swagger.path());
                 } else {
                     super.visitLdcInsn(value);
+                }
+            }
+
+            @Override
+            public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+                if(methodName.equals("getDescription") && owner.equals(optionalClass)){
+                    super.visitLdcInsn(swagger.description());
+                    super.visitMethodInsn(opcode, owner, "of", Type.getMethodDescriptor(Type.getType(Optional.class), Type.getType(Object.class)), isInterface);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                 }
             }
         }
