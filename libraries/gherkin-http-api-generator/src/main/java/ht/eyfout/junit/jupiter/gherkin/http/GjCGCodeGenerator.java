@@ -6,6 +6,8 @@ import ht.eyfout.junit.jupiter.gherkin.http.generated.GjCGRequestBuilder;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import org.apache.commons.lang3.function.TriFunction;
 import org.objectweb.asm.*;
 
@@ -21,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-final public class CodeGenerator {
+final public class GjCGCodeGenerator {
     private static ClassReader asClassReader(Class<?> klass) {
         try {
             return new ClassReader(klass.getName());
@@ -67,12 +69,12 @@ final public class CodeGenerator {
     private static byte[] with(Class<?> klass, byte[] content, SwaggerAPI api) {
         ClassReader reader = new ClassReader(content);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        Collection<Pair<String, String>> parameterPairs = new ArrayList<>();
+        Collection<Parameter> parameterPairs = new ArrayList<>();
         Optional.ofNullable(api.operation().getParameters()).ifPresent(params -> {
-            List<Pair<String, String>> pairs = params.stream()
+            List<Parameter> pairs = params.stream()
                     .filter(it -> it.getIn() != null && it.getName() != null)
                     .filter(it -> klass.getName().contains(camelCase(it.getIn())))
-                    .map(it -> new Pair<>(it.getIn(), it.getName())).toList();
+                    .toList();
             parameterPairs.addAll(pairs);
         });
         reader.accept(new ParamClassVisitor(Opcodes.ASM7, writer, parameterPairs), ClassWriter.COMPUTE_FRAMES);
@@ -114,7 +116,7 @@ final public class CodeGenerator {
                                    BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor,
                                    Function<String, String> rename) {
         ClassReader reader = asClassReader(klass);
-        ClassWriter source = new ClassWriter(reader, 0);
+        ClassWriter source = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         reader.accept(visitor.apply(source, sink), 0);
         return sink.toByteArray();
@@ -126,11 +128,11 @@ final public class CodeGenerator {
                 "header", "header",
                 "query", "queryParam"
         );
-        private final Collection<Pair<String, String>> params;
+        private final Collection<Parameter> params;
         private String vistingClassName;
         private String builderType;
 
-        ParamClassVisitor(int api, ClassVisitor cv, Collection<Pair<String, String>> params) {
+        ParamClassVisitor(int api, ClassVisitor cv, Collection<Parameter> params) {
             super(api, cv);
             this.params = params;
         }
@@ -149,6 +151,26 @@ final public class CodeGenerator {
             return super.visitField(access, name, descriptor, signature, value);
         }
 
+        private Class<?> type(String type) {
+            String ltype = Objects.requireNonNullElse(type, "");
+            type.toLowerCase();
+            if (ltype.contains("int")) {
+                return int.class;
+            } else if (ltype.contains("num")) {
+                return double.class;
+            } else {
+                return String.class;
+            }
+        }
+
+        private Class<?> type(Schema<?> schema) {
+            if (schema == null) {
+                return type("");
+            } else {
+                return type(schema.getType());
+            }
+        }
+
         @Override
         public void visitEnd() {
             String owner = Type.getType(HttpAPIRequestBuilder.class).getInternalName();
@@ -156,17 +178,17 @@ final public class CodeGenerator {
 
             params.forEach(it -> {
                 MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
-                        "set" + camelCase(it.second()),
-                        Type.getMethodDescriptor(Type.getType(void.class), Type.getType(String.class)),
+                        "set" + camelCase(it.getName()),
+                        Type.getMethodDescriptor(Type.getType(void.class), Type.getType(type(it.getSchema()))),
                         null,
                         null);
                 mv.visitCode();
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, vistingClassName, "builder", builderType);
-                mv.visitLdcInsn(it.second());
+                mv.visitLdcInsn(it.getName());
                 mv.visitVarInsn(Opcodes.ILOAD, 1);
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner,
-                        api.get(it.first().toLowerCase()),
+                        api.get(it.getIn().toLowerCase()),
                         descriptor, false);
                 mv.visitEnd();
             });
@@ -266,7 +288,6 @@ final public class CodeGenerator {
         @SuppressWarnings("unchecked")
         private <R> R invoke(Method method, Object... arguments) {
             try {
-//                method.invoke(sink, Arrays.stream(arguments).map(this::rename).toArray());
                 return (R) method.invoke(cv, Arrays.stream(arguments).map(this::rename).toArray());
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
