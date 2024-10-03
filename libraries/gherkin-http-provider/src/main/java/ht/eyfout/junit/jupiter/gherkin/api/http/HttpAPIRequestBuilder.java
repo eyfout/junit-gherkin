@@ -3,6 +3,7 @@ package ht.eyfout.junit.jupiter.gherkin.api.http;
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class HttpAPIRequestBuilder {
@@ -12,6 +13,7 @@ public class HttpAPIRequestBuilder {
     private Optional<Object> body = Optional.empty();
     final private Optional<GivenState> givenState;
     final HttpAPI<? extends HttpAPIRequestBuilder> api;
+    private List<Consumer<HttpAPIRequestBuilder>> requiredChecks = new ArrayList<>();
 
     public HttpAPIRequestBuilder(HttpAPI<? extends HttpAPIRequestBuilder> api, GivenState givenState) {
         this.api = api;
@@ -33,6 +35,18 @@ public class HttpAPIRequestBuilder {
         return this;
     }
 
+    public Object pathParam(String key) {
+        return pathParams.get(key);
+    }
+
+    public Object queryParam(String key) {
+        return queryParams.get(key);
+    }
+
+    public Object header(String key) {
+        return header(key);
+    }
+
     public HttpAPIRequestBuilder body(Object body) {
         this.body = Optional.ofNullable(body);
         return this;
@@ -43,6 +57,17 @@ public class HttpAPIRequestBuilder {
         params.putAll(pathParams);
         return params;
     }
+
+    public void requireThat(Consumer<HttpAPIRequestBuilder> requiredCheck) {
+        this.requiredChecks.add(requiredCheck);
+    }
+
+    public void enforceRequired() {
+        if (!requiredChecks.isEmpty()) {
+            requiredChecks.forEach(it -> it.accept(this));
+        }
+    }
+
 
     Map<String, Object> getHeaders() {
         return headers;

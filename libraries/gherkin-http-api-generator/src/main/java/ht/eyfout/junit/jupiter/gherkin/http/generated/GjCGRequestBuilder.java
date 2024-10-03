@@ -30,27 +30,48 @@ final public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderPar
         return this;
     }
 
-    final static public class GjCGHeaderParam {
+    public interface Param {
+        void requiredParams(HttpAPIRequestBuilder builder);
+    }
+
+    final static public class GjCGHeaderParam implements Param {
         private final HttpAPIRequestBuilder builder;
 
         public GjCGHeaderParam(HttpAPIRequestBuilder builder) {
             this.builder = builder;
+            this.builder.requireThat(this::requiredParams);
+        }
+
+        @Override
+        public void requiredParams(HttpAPIRequestBuilder builder) {
+
         }
     }
 
-    final static public class GjCGQueryParam {
+    final static public class GjCGQueryParam implements Param {
         private final HttpAPIRequestBuilder builder;
 
         public GjCGQueryParam(HttpAPIRequestBuilder builder) {
             this.builder = builder;
+            this.builder.requireThat(this::requiredParams);
+        }
+
+        @Override
+        public void requiredParams(HttpAPIRequestBuilder builder) {
         }
     }
 
-    final static public class GjCGPathParam {
+    final static public class GjCGPathParam implements Param {
         private final HttpAPIRequestBuilder builder;
 
         public GjCGPathParam(HttpAPIRequestBuilder builder) {
             this.builder = builder;
+            this.builder.requireThat(this::requiredParams);
+        }
+
+        @Override
+        public void requiredParams(HttpAPIRequestBuilder builder) {
+
         }
     }
 }

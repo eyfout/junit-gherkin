@@ -1,0 +1,55 @@
+package ht.eyfout.junit.jupiter.gherkin.http;
+
+import io.swagger.v3.oas.models.parameters.Parameter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
+import java.util.Collection;
+import java.util.Objects;
+
+public class HttpRequiredParamMethodVisitor extends MethodVisitor {
+    private final String owner;
+    private final String builderClass;
+    /**
+     * (Type, Field Name)
+     */
+    private final Pair<String, String> builder;
+    private final Collection<Parameter> params;
+
+
+    public HttpRequiredParamMethodVisitor(int api, MethodVisitor methodVisitor,
+                                          String owner,
+                                          String builderClass,
+                                          Pair<String, String> builder,
+                                          Collection<Parameter> params) {
+        super(api, methodVisitor);
+        this.owner = owner;
+        this.builderClass = builderClass;
+        this.builder = builder;
+        this.params = params;
+    }
+
+    @Override
+    public void visitCode() {
+        super.visitCode();
+        if (!params.isEmpty()) {
+            super.visitParameter("httpBuilder", Opcodes.ACC_SYNTHETIC);
+            params.forEach(it -> {
+                super.visitVarInsn(Opcodes.ALOAD, 1);
+                super.visitLdcInsn(it.getName());
+                super.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                        builderClass,
+                        HttpParamClassVisitor.aliasForIn.get(it.getIn()),
+                        Type.getMethodDescriptor(Type.getType(Object.class), Type.getType(String.class)),
+                        false);
+                super.visitLdcInsn(it.getName());
+                super.visitMethodInsn(Opcodes.INVOKESTATIC,
+                        Type.getType(Objects.class).getInternalName(),
+                        "requireNonNull",
+                        Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Object.class), Type.getType(String.class)),
+                        false);
+            });
+        }
+    }
+}

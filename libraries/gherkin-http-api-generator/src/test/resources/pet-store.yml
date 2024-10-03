@@ -241,8 +241,9 @@ paths:
             type: integer
             format: int64
         - name: name
-          in: query
+          in: path
           description: Name of pet that needs to be updated
+          required: true
           schema:
             type: string
         - name: status

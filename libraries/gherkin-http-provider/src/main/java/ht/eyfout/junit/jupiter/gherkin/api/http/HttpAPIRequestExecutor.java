@@ -59,6 +59,7 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
     public <R> R exec() {
         if (httpResponse == null) {
             try {
+                builder.enforceRequired();
                 httpResponse = specification().request(Method.valueOf(api.getHttpMethod().toUpperCase()));
             } catch (Throwable e) {
                 if (e instanceof ConnectException) {
