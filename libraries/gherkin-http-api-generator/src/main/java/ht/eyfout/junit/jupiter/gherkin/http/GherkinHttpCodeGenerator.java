@@ -50,14 +50,14 @@ final public class GherkinHttpCodeGenerator {
         return it;
     }
 
-    static public void generate(URL in, File rootDir, String namespace) {
-        Objects.requireNonNull(in);
+    static public void generate(String url, File rootDir, String namespace) {
+        Objects.requireNonNull(url);
         Objects.requireNonNull(rootDir);
         Objects.requireNonNull(namespace);
 
         final String ns = namespace.toLowerCase();
         Set<Class<?>> paramType = Arrays.stream(GjCGRequestBuilder.class.getDeclaredClasses()).collect(Collectors.toSet());
-        OpenAPI openAPI = new OpenAPIParser().readLocation(in.toString(), null, null)
+        OpenAPI openAPI = new OpenAPIParser().readLocation(url, null, null)
                 .getOpenAPI();
         Paths paths = openAPI.getPaths();
         paths.entrySet().stream().parallel().flatMap(path ->

@@ -1,8 +1,17 @@
-include(":bom")
+pluginManagement {
+    repositories{
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+//include(":bom")
 
 include(":libraries:junit-gherkin")
 include(":libraries:gherkin-http-provider")
 include(":libraries:gherkin-http-api-generator")
-
-include(":examples:micronaut-app")
 include(":plugins:junit-gherkin-http")
+
+
+includeBuild("examples")

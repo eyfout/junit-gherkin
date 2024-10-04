@@ -1,15 +1,16 @@
-plugins{
-    id 'maven-publish'
+allprojects {
+    group "ht.eyfout.junit"
+    version "0.0.1"
 }
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
 subprojects {
     repositories {
-        mavenLocal()
         mavenCentral()
+        mavenLocal()
+    }
+    plugins.apply("maven-publish")
+    publishing {
+        repositories {
+            mavenLocal()
+        }
     }
 }

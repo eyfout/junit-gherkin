@@ -19,8 +19,8 @@ public class GherkinHttpCodeGeneratorTests {
         URL supplyWarehouse = GherkinHttpCodeGeneratorTests.class.getClassLoader().getResource("supply-warehouse.yml");
         File rootDir = new File(new File("").getAbsolutePath(), "/build/generated/classes");
         rootDir.mkdirs();
-        GherkinHttpCodeGenerator.generate(petStore, rootDir, "petstore");
-        GherkinHttpCodeGenerator.generate(supplyWarehouse, rootDir, "warehouse");
+        GherkinHttpCodeGenerator.generate(petStore.toString(), rootDir, "petstore");
+        GherkinHttpCodeGenerator.generate(supplyWarehouse.toString(), rootDir, "warehouse");
 
         File destination = new File(rootDir, GherkinHttpCodeGenerator.class.getPackageName().replace('.', File.separatorChar));
         assertTrue(new File(destination, "generated/petstore").exists(), "petstore @" + destination.getAbsolutePath());

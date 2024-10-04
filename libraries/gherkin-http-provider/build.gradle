@@ -2,10 +2,6 @@ plugins {
     id("java")
 }
 
-//repositories {
-//    mavenCentral()
-//}
-
 dependencies {
     implementation libs.junit.jupiter.api
     implementation project(":libraries:junit-gherkin")
@@ -18,5 +14,14 @@ dependencies {
 test {
     useJUnitPlatform {
         includeEngines("junit-jupiter")
+    }
+}
+
+
+publishing {
+    publications{
+        mavenJava(MavenPublication){
+            from components.java
+        }
     }
 }

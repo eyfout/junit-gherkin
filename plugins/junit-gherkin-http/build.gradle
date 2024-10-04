@@ -1,0 +1,20 @@
+plugins{
+    id 'java-gradle-plugin'
+}
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation project(":libraries:gherkin-http-api-generator")
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'ht.eyfout.junit.gherkin'
+            implementationClass = 'ht.eyfout.plugins.junit.jupiter.gherkin.GherkinHttpCodeGeneratorPlugin'
+        }
+    }
+}
