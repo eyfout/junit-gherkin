@@ -9,16 +9,13 @@ import java.util.function.Function;
 
 class HttpMethodVisitor extends MethodVisitor {
 
-    private final MethodVisitor source;
     private final Function<String, String> rename;
 
     public HttpMethodVisitor(int api,
-                             MethodVisitor source,
                              MethodVisitor sink,
                              Function<String, String> rename
     ) {
         super(api, sink);
-        this.source = source;
         this.rename = rename;
     }
 
@@ -59,19 +56,16 @@ class HttpMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitEnd() {
-        Optional.ofNullable(source).ifPresent(MethodVisitor::visitEnd);
         super.visitEnd();
     }
 
     @Override
     public void visitCode() {
-        Optional.ofNullable(source).ifPresent(MethodVisitor::visitCode);
         super.visitCode();
     }
 
     @Override
     public void visitInsn(int opcode) {
-        Optional.ofNullable(source).ifPresent(it -> it.visitInsn(opcode));
         super.visitInsn(opcode);
     }
 

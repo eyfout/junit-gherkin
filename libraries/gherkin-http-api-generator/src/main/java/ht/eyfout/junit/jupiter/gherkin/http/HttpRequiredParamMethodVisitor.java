@@ -14,22 +14,22 @@ public class HttpRequiredParamMethodVisitor extends MethodVisitor {
     /**
      * (Type, Field Name)
      */
-    private final Pair<String, String> builder;
     private final Collection<Parameter> params;
 
 
     public HttpRequiredParamMethodVisitor(int api, MethodVisitor methodVisitor,
                                           String owner,
                                           String builderClass,
-                                          Pair<String, String> builder,
                                           Collection<Parameter> params) {
         super(api, methodVisitor);
         this.owner = owner;
         this.builderClass = builderClass;
-        this.builder = builder;
         this.params = params;
     }
 
+    /**
+     * Objects.requireNonNull(httpBuilder.header("orderID"), "orderID")
+     */
     @Override
     public void visitCode() {
         super.visitCode();

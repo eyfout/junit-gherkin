@@ -13,12 +13,12 @@ class HttpAPIMethodVisitor extends HttpMethodVisitor {
     private final Function<String, String> rename;
     private final String optionalClass = Type.getType(Optional.class).getInternalName();
 
-    public HttpAPIMethodVisitor(int api, MethodVisitor source,
+    public HttpAPIMethodVisitor(int api,
                                 MethodVisitor sink,
                                 SwaggerAPI swagger,
                                 String name,
                                 Function<String, String> rename) {
-        super(api, source, sink, rename);
+        super(api, sink, rename);
         this.swagger = swagger;
         this.methodName = name;
         this.rename = rename;

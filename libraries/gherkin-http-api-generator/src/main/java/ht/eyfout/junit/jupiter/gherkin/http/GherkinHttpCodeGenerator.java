@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -113,23 +112,22 @@ final public class GherkinHttpCodeGenerator {
     }
 
     private static byte[] generate(Class<?> klass, SwaggerAPI api, Function<String, String> rename) {
-        return generate(klass, (source, sink) -> new HttpClassVisitor(Opcodes.ASM7, source, sink, rename,
+        return generate(klass, (sink) -> new HttpClassVisitor(Opcodes.ASM7, sink, rename,
                 (name, descriptor, it) -> {
                     if (klass == GjCGHttpAPI.class) {
-                        return new HttpAPIMethodVisitor(Opcodes.ASM7, null, it, api, name, rename);
+                        return new HttpAPIMethodVisitor(Opcodes.ASM7, it, api, name, rename);
                     } else {
-                        return new HttpMethodVisitor(Opcodes.ASM7, null, it, rename);
+                        return new HttpMethodVisitor(Opcodes.ASM7, it, rename);
                     }
                 })
         );
     }
 
     private static byte[] generate(Class<?> klass,
-                                   BiFunction<ClassVisitor, ClassVisitor, ClassVisitor> visitor) {
+                                   Function<ClassVisitor, ClassVisitor> visitor) {
         ClassReader reader = asClassReader(klass);
-        ClassWriter source = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        reader.accept(visitor.apply(source, sink), ClassReader.EXPAND_FRAMES);
+        reader.accept(visitor.apply(sink), ClassReader.EXPAND_FRAMES);
         return sink.toByteArray();
     }
 

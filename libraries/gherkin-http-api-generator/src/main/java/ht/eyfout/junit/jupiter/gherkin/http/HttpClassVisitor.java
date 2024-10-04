@@ -12,7 +12,6 @@ class HttpClassVisitor extends ClassVisitor {
     private final TriFunction<String, String, MethodVisitor, MethodVisitor> mv;
 
     public HttpClassVisitor(int api,
-                            ClassVisitor source,
                             ClassVisitor sink,
                             Function<String, String> rebrand,
                             TriFunction<String, String, MethodVisitor, MethodVisitor> methodVisitor) {

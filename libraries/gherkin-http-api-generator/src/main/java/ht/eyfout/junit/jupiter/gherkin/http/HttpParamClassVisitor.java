@@ -73,12 +73,18 @@ class HttpParamClassVisitor extends ClassVisitor {
                     mv,
                     className,
                     builderClass,
-                    builder,
                     params.stream().filter(Parameter::getRequired).toList());
         }
         return mv;
     }
 
+    /**
+     * Setter method query, path or header parameter, i.e:
+     * <p>
+     * void setAuthorization(String authorization){
+     * this.builder.header("authorization", authorization);
+     * }
+     */
     @Override
     public void visitEnd() {
         String owner = Type.getType(HttpAPIRequestBuilder.class).getInternalName();
