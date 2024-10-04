@@ -5,17 +5,21 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 class HttpMethodVisitor extends MethodVisitor {
 
     private final MethodVisitor source;
+    private final Function<String, String> rename;
 
     public HttpMethodVisitor(int api,
                              MethodVisitor source,
-                             MethodVisitor sink
+                             MethodVisitor sink,
+                             Function<String, String> rename
     ) {
         super(api, sink);
         this.source = source;
+        this.rename = rename;
     }
 
     @Override
@@ -25,7 +29,12 @@ class HttpMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        super.visitMethodInsn(opcode, rename(owner), name, rename(descriptor), isInterface);
+    }
+
+    @Override
+    public void visitTypeInsn(int opcode, String type) {
+        super.visitTypeInsn(opcode, rename(type));
     }
 
     @Override
@@ -64,5 +73,9 @@ class HttpMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         Optional.ofNullable(source).ifPresent(it -> it.visitInsn(opcode));
         super.visitInsn(opcode);
+    }
+
+    String rename(String it) {
+        return this.rename.apply(it);
     }
 }

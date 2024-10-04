@@ -18,7 +18,7 @@ class HttpAPIMethodVisitor extends HttpMethodVisitor {
                                 SwaggerAPI swagger,
                                 String name,
                                 Function<String, String> rename) {
-        super(api, source, sink);
+        super(api, source, sink, rename);
         this.swagger = swagger;
         this.methodName = name;
         this.rename = rename;

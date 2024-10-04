@@ -37,10 +37,14 @@ final public class GherkinHttpCodeGenerator {
     static String replace(String namespace, String it, String other) {
         if (it != null) {
             int index = it.indexOf("GjCG");
+//            String str = it.replace("GjCG", other);
+            Character delimiter = null;
+            if (index > 2) {
+                delimiter = it.charAt(index - 1);
+            }
             String str = it.replace("GjCG", other);
-            if (index > 0) {
-                char delimiter = str.charAt(index - 1);
-                str = str.substring(0, index - 1) + delimiter + namespace + delimiter + str.substring(index);
+            if (delimiter != null) {
+                str = str.replace(delimiter + other, delimiter + namespace + delimiter + other);
             }
             return str;
         }
@@ -114,7 +118,7 @@ final public class GherkinHttpCodeGenerator {
                     if (klass == GjCGHttpAPI.class) {
                         return new HttpAPIMethodVisitor(Opcodes.ASM7, null, it, api, name, rename);
                     } else {
-                        return new HttpMethodVisitor(Opcodes.ASM7, null, it);
+                        return new HttpMethodVisitor(Opcodes.ASM7, null, it, rename);
                     }
                 })
         );
@@ -125,7 +129,7 @@ final public class GherkinHttpCodeGenerator {
         ClassReader reader = asClassReader(klass);
         ClassWriter source = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        reader.accept(visitor.apply(source, sink), 0);
+        reader.accept(visitor.apply(source, sink), ClassReader.EXPAND_FRAMES);
         return sink.toByteArray();
     }
 
