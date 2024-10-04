@@ -20,12 +20,10 @@ dependencies {
     compileOnly("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("ht.eyfout.junit:junit-gherkin:0.0.1")
-    implementation("ht.eyfout.junit:gherkin-http-provider:0.0.1")
-    implementation("ht.eyfout.junit:gherkin-http-api-generator:0.0.1")
 
-    testImplementation("ht.eyfout.junit:junit-gherkin:0.0.1")
-    testImplementation("ht.eyfout.junit:gherkin-http-provider:0.0.1")
+    implementation libs.junit.gherkin
+    implementation libs.gherkin.http.api
+    implementation libs.gherkin.http
 
     testImplementation("io.micronaut:micronaut-http-client")
 //    testImplementation(project(":libraries:gherkin-http-provider"))
