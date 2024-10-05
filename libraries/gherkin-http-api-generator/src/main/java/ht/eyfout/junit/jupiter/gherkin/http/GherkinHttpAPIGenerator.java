@@ -22,8 +22,17 @@ final public class GherkinHttpAPIGenerator {
         return it.toUpperCase().charAt(0) + it.substring(1);
     }
 
+    static private byte[] bytes(Class<?> klass) {
+        try {
+            return klass.getClassLoader().getResourceAsStream(klass.getName().replace('.', '/') + ".class").readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(klass.getName(), e);
+        }
+    }
+
     /**
      * Replace prefix in str with with
+     *
      * @param namespace
      * @param str
      * @param prefix
@@ -51,24 +60,34 @@ final public class GherkinHttpAPIGenerator {
     }
 
     /**
-     *
      * @param url
      * @param rootDir
      * @param namespace
      */
     static public void generate(String url, File rootDir, String namespace) {
-        codeGen(url, namespace).all().forEach(it -> {
-            int index = it.first().lastIndexOf('/');
-            File dir = new File(rootDir, it.first().substring(0, index));
-            dir.mkdirs();
-            File fs = new File(dir, it.first().substring(index + 1) + ".class");
-            try {
-                fs.createNewFile();
-                new FileOutputStream(fs).write(it.second());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        codeGen(url, namespace).generate(it -> {
+                    it.setPrefix("GjCG");
+                    Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGRequestBuilder.class.getDeclaredClasses()).flatMap(klass ->
+                            it.rebrand(bytes(klass), true)
+                    );
+                    Stream<Pair<String, byte[]>> apis = Stream.concat(
+                            it.rebrand(bytes(GjCGRequestBuilder.class), false),
+                            it.withDesc(bytes(GjCGHttpAPI.class))
+                    );
+                    return Stream.concat(apis, parameters);
+                })
+                .forEach(it -> {
+                    int index = it.first().lastIndexOf('/');
+                    File dir = new File(rootDir, it.first().substring(0, index));
+                    dir.mkdirs();
+                    File fs = new File(dir, it.first().substring(index + 1) + ".class");
+                    try {
+                        fs.createNewFile();
+                        new FileOutputStream(fs).write(it.second());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     static public CodeGenerator codeGen(String url, String namespace) {
@@ -94,6 +113,10 @@ final public class GherkinHttpAPIGenerator {
             this.prefix = prefix;
         }
 
+        public String getPrefix() {
+            return prefix;
+        }
+
         private static byte[] methodParams(String klass, byte[] content, SwaggerAPI api, Function<String, String> rename) {
             ClassReader reader = new ClassReader(content);
             ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -109,28 +132,9 @@ final public class GherkinHttpAPIGenerator {
             return writer.toByteArray();
         }
 
-        private byte[] bytes(Class<?> klass) {
-            try {
-                return klass.getClassLoader().getResourceAsStream(klass.getName().replace('.', '/') + ".class").readAllBytes();
-            } catch (IOException e) {
-                throw new RuntimeException(klass.getName(), e);
-            }
-        }
-
-        public Stream<Pair<String, byte[]>> all() {
-            Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGRequestBuilder.class.getDeclaredClasses()).flatMap(klass ->
-                    generate(it -> it.rebrand(bytes(klass), true))
-            );
-            Stream<Pair<String, byte[]>> apis = Stream.concat(
-                    generate(it -> rebrand(bytes(GjCGRequestBuilder.class), false)),
-                    generate(it -> withDesc(bytes(GjCGHttpAPI.class)))
-            );
-            return Stream.concat(apis, parameters);
-        }
-
         public Stream<Pair<String, byte[]>> rebrand(byte[] template, boolean isParam) {
             return apis.stream().map(api -> {
-                Function<String, String> rename = it -> replace(namespace, it, prefix, api.id());
+                Function<String, String> rename = it -> replace(namespace, it, getPrefix(), api.id());
                 ClassReader reader = new ClassReader(template);
                 ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
                 HttpClassVisitor httpVisitor = new HttpClassVisitor(Opcodes.ASM7, sink, rename, (n, d, v) -> new HttpMethodVisitor(Opcodes.ASM7, v, rename));
