@@ -32,27 +32,6 @@ dependencies {
 
 }
 
-
-sourceSets {
-    main {
-        java {
-            srcDir "$buildDir/junit-gherkin/sources"
-        }
-        output.dir("$buildDir/junit-gherkin/classes")
-    }
-}
-genGherkinHttpAPI {
-    mustRunAfter(tasks.compileKotlin)
-//    specification = layout.projectDirectory.file("src/main/resources/junit-gherkin/pets.yml").asFile
-//    out = layout.buildDirectory.dir('junit-gherkin/classes').get().asFile
-}
-
-jar{
-    from("$layout.buildDirectory/junit-gherkin/classes"){
-        into ''
-    }
-}
-
 application {
     mainClass = "ht.eyfout.example.ApplicationKt"
 }
@@ -83,6 +62,3 @@ micronaut {
 //        replaceLogbackXml = true
 //    }
 }
-
-
-

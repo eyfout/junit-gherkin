@@ -5,8 +5,7 @@ import ht.eyfout.junit.jupiter.gherkin.http.GherkinHttpAPIGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.Directory;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.InputDirectory;
-import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
@@ -22,10 +21,12 @@ abstract class GherkinHttpCodeGenerationTask extends DefaultTask {
 
     }
 
-    @InputDirectory
-    private Directory specification = getProject().getLayout().getProjectDirectory().dir("src/main/resources/junit-gherkin");
+    @Input
+    private String specsDir = "resources/junit-gherkin";
     @OutputDirectory
-    private Provider<Directory> out = getProject().getLayout().getBuildDirectory().dir("generated/junit-gherkin");
+    Provider<Directory> outputDir = getProject().getLayout().getBuildDirectory().dir("generated/junit-gherkin");
+
+    private String sourceSet;
 
 
     byte[] load(String klass) {
@@ -40,43 +41,55 @@ abstract class GherkinHttpCodeGenerationTask extends DefaultTask {
     @TaskAction
     void action() {
         String pkg = "ht/eyfout/junit/jupiter/gherkin/http/generated/";
-        specification.getAsFileTree().forEach(openAPI -> {
-            GherkinHttpAPIGenerator.codeGen(openAPI.getAbsolutePath(), openAPI.getName())
-                    .generate(
-                            it -> it.rebrand(load(pkg + "GjCGRequestBuilder.class"), false),
-                            it -> it.withDesc(load(pkg + "GjCGHttpAPI.class")),
-                            it -> it.rebrand(load(pkg + "GjCGRequestBuilder$GjCGQueryParam.class"), true),
-                            it -> it.rebrand(load(pkg + "GjCGRequestBuilder$GjCGPathParam.class"), true),
-                            it -> it.rebrand(load(pkg + "GjCGRequestBuilder$GjCGHeaderParam.class"), true),
-                            it -> it.rebrand(load(pkg + "GjCGRequestBuilder$Param.class"), false)
-                    ).forEach(it -> {
-                        int index = it.first().lastIndexOf('/');
-                        File dir = new File(out.get().getAsFile(), it.first().substring(0, index));
-                        dir.mkdirs();
-                        File fs = new File(dir, it.first().substring(index + 1) + ".class");
-                        try( FileOutputStream os = new FileOutputStream(fs)) {
-                            fs.createNewFile();
-                            os.write(it.second());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-        });
+        Directory specsDir = getProject().getLayout().getProjectDirectory().dir("src/" + sourceSet + "/" + this.specsDir);
+        if (specsDir.getAsFile().exists()) {
+            specsDir.getAsFileTree().forEach(openAPI -> {
+                String namespace = openAPI.getName();
+                int fileExtension = namespace.indexOf('.');
+                if (fileExtension > 0) {
+                    namespace = namespace.substring(0, fileExtension);
+                }
+                GherkinHttpAPIGenerator.codeGen(openAPI.getAbsolutePath(), namespace)
+                        .generate(
+                                it -> it.rebrand(load(pkg + "GjCGRequestBuilder.class"), false),
+                                it -> it.withDesc(load(pkg + "GjCGHttpAPI.class")),
+                                it -> it.rebrand(load(pkg + "GjCGRequestBuilder$GjCGQueryParam.class"), true),
+                                it -> it.rebrand(load(pkg + "GjCGRequestBuilder$GjCGPathParam.class"), true),
+                                it -> it.rebrand(load(pkg + "GjCGRequestBuilder$GjCGHeaderParam.class"), true),
+                                it -> it.rebrand(load(pkg + "GjCGRequestBuilder$Param.class"), false)
+                        ).forEach(it -> {
+                            int index = it.first().lastIndexOf('/');
+                            File dir = new File(outputDir.get().getAsFile(), it.first().substring(0, index));
+                            dir.mkdirs();
+                            File fs = new File(dir, it.first().substring(index + 1) + ".class");
+                            try (FileOutputStream os = new FileOutputStream(fs)) {
+                                fs.createNewFile();
+                                os.write(it.second());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+            });
+        }
     }
 
-    public Directory getSpecification() {
-        return specification;
+    public String getSpecsDir() {
+        return specsDir;
     }
 
-    public void setSpecification(Directory specification) {
-        this.specification = specification;
+    public void setSpecsDir(String specsDir) {
+        this.specsDir = specsDir;
     }
 
-    public Provider<Directory> getOut() {
-        return out;
+    void setOutputDir(Provider<Directory> outputDir) {
+        this.outputDir = outputDir;
     }
 
-    public void setOut(Provider<Directory> out) {
-        this.out = out;
+    Provider<Directory> getOutputDir() {
+        return outputDir;
+    }
+
+    void setSourceSet(String sourceSet) {
+        this.sourceSet = sourceSet;
     }
 }
