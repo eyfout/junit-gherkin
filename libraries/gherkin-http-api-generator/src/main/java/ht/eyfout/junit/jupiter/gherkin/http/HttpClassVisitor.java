@@ -4,12 +4,14 @@ import org.apache.commons.lang3.function.TriFunction;
 import org.objectweb.asm.*;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 
 class HttpClassVisitor extends ClassVisitor {
 
     private final Function<String, String> rebrand;
     private final TriFunction<String, String, MethodVisitor, MethodVisitor> mv;
+    private String name;
 
     public HttpClassVisitor(int api,
                             ClassVisitor sink,
@@ -20,6 +22,11 @@ class HttpClassVisitor extends ClassVisitor {
         this.mv = methodVisitor;
     }
 
+    public HttpClassVisitor(int api,
+                            ClassVisitor sink,
+                            Function<String, String> rebrand) {
+        this(api, sink, rebrand, (n, d, v) -> new HttpMethodVisitor(api, v, rebrand));
+    }
 
     @Override
     public void visitAttribute(Attribute attribute) {
@@ -43,6 +50,7 @@ class HttpClassVisitor extends ClassVisitor {
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        this.name = rename(name);
         super.visit(version, access, rename(name), rename(signature), rename(superName), rename(interfaces));
     }
 
@@ -94,6 +102,10 @@ class HttpClassVisitor extends ClassVisitor {
     @Override
     public void visitPermittedSubclass(String permittedSubclass) {
         super.visitPermittedSubclass(rename(permittedSubclass));
+    }
+
+    public Optional<String> name() {
+        return Optional.ofNullable(this.name);
     }
 
     private <R> R rename(R it) {

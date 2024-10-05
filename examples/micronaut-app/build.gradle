@@ -26,8 +26,6 @@ dependencies {
     implementation libs.gherkin.http
 
     testImplementation("io.micronaut:micronaut-http-client")
-//    testImplementation(project(":libraries:gherkin-http-provider"))
-//    testImplementation(project(":libraries:junit-gherkin"))
     testImplementation libs.mockk
     testImplementation libs.rest.assured
     testImplementation libs.jakarta.inject.api
@@ -36,16 +34,23 @@ dependencies {
 
 
 sourceSets {
-    main{
-        java{
-            srcDir "$buildDir/generated/sources"
+    main {
+        java {
+            srcDir "$buildDir/junit-gherkin/sources"
         }
+        output.dir("$buildDir/junit-gherkin/classes")
     }
 }
-genGherkinHttpAPI{
-    mustRunAfter(tasks.compileJava)
-    specification = layout.projectDirectory.file("src/main/resources/junit-gherkin/pets.yml").asFile
-    out = layout.buildDirectory.dir('generated/sources').get().asFile
+genGherkinHttpAPI {
+    mustRunAfter(tasks.compileKotlin)
+//    specification = layout.projectDirectory.file("src/main/resources/junit-gherkin/pets.yml").asFile
+//    out = layout.buildDirectory.dir('junit-gherkin/classes').get().asFile
+}
+
+jar{
+    from("$layout.buildDirectory/junit-gherkin/classes"){
+        into ''
+    }
 }
 
 application {

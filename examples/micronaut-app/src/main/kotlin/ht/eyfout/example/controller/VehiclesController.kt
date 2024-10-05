@@ -24,7 +24,6 @@ class VehiclesController(private val dmvClient: DMVClient) {
             }.flatMap {
                 dmvClient.vehicles(authorization, it.id).body().stream()
             }.toList())
-
             else -> httpResponse as HttpResponse<Collection<Vehicle>>
         }
     }

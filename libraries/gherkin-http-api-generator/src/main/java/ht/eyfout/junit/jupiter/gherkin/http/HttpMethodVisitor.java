@@ -4,7 +4,6 @@ import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 class HttpMethodVisitor extends MethodVisitor {

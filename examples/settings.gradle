@@ -5,4 +5,12 @@ pluginManagement {
         mavenCentral()
     }
 }
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
 include("micronaut-app")
+rootProject.name = "example"

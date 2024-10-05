@@ -4,8 +4,8 @@ allprojects {
 }
 subprojects {
     repositories {
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
     }
     plugins.apply("maven-publish")
     publishing {

@@ -7,16 +7,16 @@ import javax.inject.Inject;
 
 public class GherkinHttpCodeGeneratorPlugin implements Plugin<Project> {
     @Inject
-    public GherkinHttpCodeGeneratorPlugin(){
+    public GherkinHttpCodeGeneratorPlugin() {
 
     }
+
     @Override
     public void apply(Project project) {
-
         project.getTasks().register("genGherkinHttpAPI",
                 GherkinHttpCodeGenerationTask.class, it -> {
                     it.setGroup("Code Generation");
-                    it.setDescription("Generates Java representation of the OpenAPI.");
+                    it.setDescription("Generates Java bytecode representation of the OpenAPI.");
                 });
     }
 }

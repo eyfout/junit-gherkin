@@ -92,7 +92,7 @@ class HttpParamClassVisitor extends ClassVisitor {
 
         params.forEach(it -> {
             MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
-                    "set" + GherkinHttpCodeGenerator.camelCase(it.getName()),
+                    "set" + GherkinHttpAPIGenerator.camelCase(it.getName()),
                     Type.getMethodDescriptor(Type.getType(void.class), Type.getType(type(it.getSchema()))),
                     null,
                     null);
