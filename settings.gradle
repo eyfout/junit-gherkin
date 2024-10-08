@@ -11,7 +11,7 @@ pluginManagement {
 include(":libraries:junit-gherkin")
 include(":libraries:gherkin-http-provider")
 include(":libraries:gherkin-http-api-generator")
-include(":plugins:junit-gherkin-http")
+include(":gradle-plugin")
 
 
 includeBuild("examples")
