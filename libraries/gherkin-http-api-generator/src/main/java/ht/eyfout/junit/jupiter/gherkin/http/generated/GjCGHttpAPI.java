@@ -5,10 +5,8 @@ import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI;
 
 import java.util.Optional;
 
-final public class GjCGHttpAPI<
-        H extends GjCGRequestBuilder.GjCGHeaderParam,
-        P extends GjCGRequestBuilder.GjCGPathParam,
-        Q extends GjCGRequestBuilder.GjCGQueryParam> implements HttpAPI<GjCGRequestBuilder<H, P, Q>> {
+final public class GjCGHttpAPI implements HttpAPI<GjCGRequestBuilder<GjCGRequestBuilder.GjCGHeaderParam, GjCGRequestBuilder.GjCGPathParam, GjCGRequestBuilder.GjCGQueryParam>> {
+    static final GjCGHttpAPI INSTANCE = new GjCGHttpAPI();
 
     @Override
     public String getHttpMethod() {
@@ -26,7 +24,7 @@ final public class GjCGHttpAPI<
     }
 
     @Override
-    public GjCGRequestBuilder<H, P, Q> builder(GivenState givenState) {
+    public GjCGRequestBuilder<GjCGRequestBuilder.GjCGHeaderParam, GjCGRequestBuilder.GjCGPathParam, GjCGRequestBuilder.GjCGQueryParam> builder(GivenState givenState) {
         return new GjCGRequestBuilder<>(this, givenState);
     }
 }

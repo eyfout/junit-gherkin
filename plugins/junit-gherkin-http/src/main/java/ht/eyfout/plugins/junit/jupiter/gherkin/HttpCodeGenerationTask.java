@@ -14,10 +14,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-abstract class GherkinHttpCodeGenerationTask extends DefaultTask {
+abstract class HttpCodeGenerationTask extends DefaultTask {
 
     @Inject
-    public GherkinHttpCodeGenerationTask() {
+    public HttpCodeGenerationTask() {
 
     }
 
@@ -41,7 +41,7 @@ abstract class GherkinHttpCodeGenerationTask extends DefaultTask {
     @TaskAction
     void action() {
         String pkg = "ht/eyfout/junit/jupiter/gherkin/http/generated/";
-        Directory specsDir = getProject().getLayout().getProjectDirectory().dir("src/" + sourceSet + "/" + this.specsDir);
+        Directory specsDir = getProject().getLayout().getProjectDirectory().dir(getSpecsDir());
         if (specsDir.getAsFile().exists()) {
             specsDir.getAsFileTree().forEach(openAPI -> {
                 String namespace = openAPI.getName();
@@ -87,9 +87,5 @@ abstract class GherkinHttpCodeGenerationTask extends DefaultTask {
 
     Provider<Directory> getOutputDir() {
         return outputDir;
-    }
-
-    void setSourceSet(String sourceSet) {
-        this.sourceSet = sourceSet;
     }
 }

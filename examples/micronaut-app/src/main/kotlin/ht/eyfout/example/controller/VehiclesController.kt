@@ -47,6 +47,8 @@ class VehiclesController(private val dmvClient: DMVClient) {
     suspend fun manufacturers(
         @Header("Authorization") authorization: String,
     ): HttpResponse<Collection<VehicleManufacturer>> {
+
+
         val httpResponse = dmvClient.carManufacturers(authorization)
         return when (httpResponse.code()) {
             HttpStatus.OK.code -> HttpResponse.ok(httpResponse.body())

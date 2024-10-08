@@ -24,10 +24,11 @@ public class HttpAPIWhenScope extends WhenScope {
         return builder;
     }
 
+
     @Override
     final public Stream<WhenScopeExecutor> scopeExecutor(GivenState given) {
         return httpRequests.stream().flatMap(requests ->
-                Arrays.stream(requests.getKey()).map(api -> api.executor(requests.getValue(), given))
+                Arrays.stream(requests.getKey()).map(api -> api.executor(requests.getValue()))
         );
     }
 }

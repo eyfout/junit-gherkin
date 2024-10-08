@@ -92,4 +92,9 @@ public class HttpAPIRequestBuilder {
                 .filter(it -> it.getValue() != null)
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
+
+    @SuppressWarnings("unchecked")
+    <Exec extends HttpAPIRequestExecutor> Exec execute() {
+        return (Exec) new HttpAPIRequestExecutor(api, this);
+    }
 }

@@ -17,11 +17,11 @@ public interface HttpAPI<B extends HttpAPIRequestBuilder> {
 
     @SuppressWarnings("unchecked")
     default B builder(GivenState givenState){
-        return (B)new HttpAPIRequestBuilder((HttpAPI<HttpAPIRequestBuilder>) this, givenState);
+        return (B)new HttpAPIRequestBuilder(this, givenState);
     }
 
     @SuppressWarnings("unchecked")
-    default <Exec extends HttpAPIRequestExecutor> Exec executor(HttpAPIRequestBuilder builder, GivenState givenState) {
-        return (Exec) new HttpAPIRequestExecutor(this, builder, givenState);
+    default <Exec extends HttpAPIRequestExecutor> Exec executor(HttpAPIRequestBuilder builder) {
+        return (Exec) new HttpAPIRequestExecutor(this, builder);
     }
 }

@@ -1,11 +1,11 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.9.25"
+    id("ht.eyfout.junit.gherkin.http") version "0.0.1"
 
     id("com.google.devtools.ksp") version "1.9.25-1.0.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.micronaut.application") version "4.4.2"
-    id("ht.eyfout.junit.gherkin") version "0.0.1"
 //    id("io.micronaut.aot") version "4.4.2"
 }
 
@@ -30,6 +30,9 @@ dependencies {
     testImplementation libs.rest.assured
     testImplementation libs.jakarta.inject.api
 
+    implementation project.files("${layout.buildDirectory}/generated/junit-gherkin/main/classes")
+    testImplementation project.files("${layout.buildDirectory}/generated/junit-gherkin/test/classes")
+
 }
 
 application {
@@ -38,6 +41,14 @@ application {
 java {
     sourceCompatibility = JavaVersion.toVersion("18")
 }
+
+//sourceSets {
+//    main{
+//        java {
+//            srcDir "$buildDir/generated/junit-gherkin/main/classes"
+//        }
+//    }
+//}
 
 
 graalvmNative.toolchainDetection = false

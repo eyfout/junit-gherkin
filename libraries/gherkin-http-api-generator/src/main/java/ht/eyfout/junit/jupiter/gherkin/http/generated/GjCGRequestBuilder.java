@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 final public class GjCGRequestBuilder<H extends GjCGRequestBuilder.GjCGHeaderParam,
         P extends GjCGRequestBuilder.GjCGPathParam,
         Q extends GjCGRequestBuilder.GjCGQueryParam> extends HttpAPIRequestBuilder {
-    public GjCGRequestBuilder(GjCGHttpAPI<H, P, Q> api, GivenState givenState) {
+    public GjCGRequestBuilder(GjCGHttpAPI api, GivenState givenState) {
         super(api, givenState);
     }
 
