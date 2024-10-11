@@ -12,7 +12,7 @@ public class HttpAPIRequestBuilder {
     final private Map<String, Object> pathParams = new HashMap<>();
     private Optional<Object> body = Optional.empty();
     final private Optional<GivenState> givenState;
-    final HttpAPI<? extends HttpAPIRequestBuilder> api;
+    public final HttpAPI<? extends HttpAPIRequestBuilder> api;
     private List<Consumer<HttpAPIRequestBuilder>> requiredChecks = new ArrayList<>();
 
     public HttpAPIRequestBuilder(HttpAPI<? extends HttpAPIRequestBuilder> api, GivenState givenState) {
@@ -35,16 +35,16 @@ public class HttpAPIRequestBuilder {
         return this;
     }
 
-    public Object pathParam(String key) {
-        return pathParams.get(key);
+    public <R> R pathParam(String key) {
+        return (R)pathParams.get(key);
     }
 
-    public Object queryParam(String key) {
-        return queryParams.get(key);
+    public <R> R queryParam(String key) {
+        return (R)queryParams.get(key);
     }
 
-    public Object header(String key) {
-        return header(key);
+    public <R> R header(String key) {
+        return (R)header(key);
     }
 
     public HttpAPIRequestBuilder body(Object body) {

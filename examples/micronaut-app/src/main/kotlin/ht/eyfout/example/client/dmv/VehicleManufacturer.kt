@@ -1,4 +1,4 @@
-package ht.eyfout.example.client;
+package ht.eyfout.example.client.dmv
 
 import io.micronaut.serde.annotation.Serdeable
 

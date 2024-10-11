@@ -1,8 +1,8 @@
-package ht.eyfout.example
+package ht.eyfout.dmv
 
-import ht.eyfout.example.client.DMVClient
-import ht.eyfout.example.http.ControllerAPI
-import ht.eyfout.example.http.ExampleStateScopeProvider
+import ht.eyfout.example.client.dmv.DMVClient
+import ht.eyfout.dmv.http.ExampleStateScopeProvider
+import ht.eyfout.example.controller.VehiclesController
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestFactory
 
 @MicronautTest
-class GroupedHttpRequestsTests {
+class CascadeWhenTests {
 
     @MockBean(DMVClient::class)
     val dmvClient: DMVClient = mockk()
@@ -23,28 +23,28 @@ class GroupedHttpRequestsTests {
     lateinit var provider: ExampleStateScopeProvider
 
     @TestFactory
-    fun grouped() = GherkinDynamicTest
+    fun `cascaded when`() = GherkinDynamicTest
         .dynamicTest(provider)
         .given("an unauthorized request") {
             it.GETManufacturerAnswer(null) {
                 HttpResponse.unauthorized()
             }
+
             it.GETVehiclesAnswer(null, null) {
                 HttpResponse.unauthorized()
             }
-        }.`when`("calling service api") {
-            it.httpRequest(ControllerAPI.VehiclesByManufacturerName)
+        }.`when`("GET vehicles using manufacturer name") {
+            it.httpRequest(VehiclesController.APIEndpoint.VehiclesByManufacturerName)
                 .queryParam("make", "Nissan")
                 .header("Authorization", "other")
-
-            it.httpRequest(ControllerAPI.VehiclesByManufacturerID)
+        }.`when`("GET vehicles using manufacturer ID") {
+            it.httpRequest(VehiclesController.APIEndpoint.VehiclesByManufacturerID)
                 .header("Authorization", "other")
                 .pathParam("manufacturerID", "Nissan-#1")
-
-            it.httpRequest(ControllerAPI.Manufacturers)
+        }.`when`("GET manufactures") {
+            it.httpRequest(VehiclesController.APIEndpoint.Manufacturers)
                 .header("Authorization", "other")
         }.then("Http 401") {
             assertEquals(HttpStatus.UNAUTHORIZED.code, it.httpResponse().statusCode())
         }
-
 }

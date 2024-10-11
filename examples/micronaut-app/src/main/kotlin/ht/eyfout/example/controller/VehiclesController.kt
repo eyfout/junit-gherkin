@@ -1,15 +1,36 @@
 package ht.eyfout.example.controller
 
-import ht.eyfout.example.client.DMVClient
-import ht.eyfout.example.client.Vehicle
-import ht.eyfout.example.client.VehicleManufacturer
+import ht.eyfout.example.client.dmv.DMVClient
+import ht.eyfout.example.client.dmv.Vehicle
+import ht.eyfout.example.client.dmv.VehicleManufacturer
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpEndpoint
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
+import java.util.*
 
 @Controller("v1/")
 class VehiclesController(private val dmvClient: DMVClient) {
+    enum class APIEndpoint : HttpEndpoint {
+        VehiclesByManufacturerID {
+            override fun getHttpMethod(): String = "GET"
+            override fun getBasePath(): String = "v1/manufacturers/{manufacturerID}/vehicles"
+            override fun getDescription(): Optional<String> = Optional.of("vehicles by manufacturer ID")
+        },
+        VehiclesByManufacturerName {
+            override fun getHttpMethod(): String = "GET"
+            override fun getBasePath(): String = "v1/vehicles"
+            override fun getDescription(): Optional<String> = Optional.of("vehicles by manufacturer name")
+        },
+        Manufacturers {
+            override fun getHttpMethod(): String = "GET"
+            override fun getBasePath(): String = "v1/manufacturers"
+            override fun getDescription(): Optional<String> = Optional.of("manufacturers")
+        }
+
+    }
+
 
     @Get("vehicles")
     @Produces(MediaType.APPLICATION_JSON)

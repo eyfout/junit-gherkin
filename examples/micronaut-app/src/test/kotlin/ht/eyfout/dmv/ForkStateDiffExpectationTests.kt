@@ -1,10 +1,10 @@
-package ht.eyfout.example
+package ht.eyfout.dmv
 
-import ht.eyfout.example.client.DMVClient
-import ht.eyfout.example.client.Vehicle
-import ht.eyfout.example.client.VehicleManufacturer
-import ht.eyfout.example.http.ControllerAPI
-import ht.eyfout.example.http.ExampleStateScopeProvider
+import ht.eyfout.example.client.dmv.DMVClient
+import ht.eyfout.example.client.dmv.Vehicle
+import ht.eyfout.example.client.dmv.VehicleManufacturer
+import ht.eyfout.dmv.http.ExampleStateScopeProvider
+import ht.eyfout.example.controller.VehiclesController
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
@@ -51,11 +51,11 @@ class ForkStateDiffExpectationTests {
             }
         }.fork({
             it.`when`("GET vehicles using manufacturer name") {
-                it.httpRequest(ControllerAPI.VehiclesByManufacturerName)
+                it.httpRequest(VehiclesController.APIEndpoint.VehiclesByManufacturerName)
                     .queryParam("make", "Nissan")
                     .header("Authorization", "eyfout")
             }.`when`("GET vehicles using manufacturer ID") {
-                it.httpRequest(ControllerAPI.VehiclesByManufacturerID)
+                it.httpRequest(VehiclesController.APIEndpoint.VehiclesByManufacturerID)
                     .header("Authorization", "eyfout")
                     .pathParam("manufacturerID", "Nissan-#1")
             }.then("Altima and Maxima") {
@@ -66,7 +66,7 @@ class ForkStateDiffExpectationTests {
             }
         }, {
             it.`when`("GET all manufacturers") {
-                it.httpRequest(ControllerAPI.Manufacturers)
+                it.httpRequest(VehiclesController.APIEndpoint.Manufacturers)
                     .header("Authorization", "eyfout")
             }.then("Nissan, Ford, Subaru") {
                 assertEquals(HttpStatus.OK.code, it.httpResponse().statusCode())

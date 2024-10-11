@@ -1,6 +1,6 @@
-package ht.eyfout.example.http
+package ht.eyfout.dmv.http
 
-import ht.eyfout.example.client.DMVClient
+import ht.eyfout.example.client.dmv.DMVClient
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIStateScopeProvider
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIThenScope
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIWhenScope

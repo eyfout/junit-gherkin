@@ -1,4 +1,4 @@
-package ht.eyfout.example.client
+package ht.eyfout.example.client.dmv
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Get
@@ -19,4 +19,3 @@ interface DMVClient {
         @PathVariable manufacturerID: String
     ): HttpResponse<Collection<Vehicle>>
 }
-
