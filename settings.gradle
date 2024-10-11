@@ -6,7 +6,6 @@ pluginManagement {
     }
 }
 
-//include(":bom")
 
 include(":libraries:junit-gherkin")
 include(":libraries:gherkin-http-provider")

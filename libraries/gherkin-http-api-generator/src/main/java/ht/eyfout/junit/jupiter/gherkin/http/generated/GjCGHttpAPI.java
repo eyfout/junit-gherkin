@@ -6,7 +6,7 @@ import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI;
 import java.util.Optional;
 
 final public class GjCGHttpAPI implements HttpAPI<GjCGRequestBuilder<GjCGRequestBuilder.GjCGHeaderParam, GjCGRequestBuilder.GjCGPathParam, GjCGRequestBuilder.GjCGQueryParam>> {
-    static final GjCGHttpAPI INSTANCE = new GjCGHttpAPI();
+    public static final GjCGHttpAPI INSTANCE = new GjCGHttpAPI();
 
     @Override
     public String getHttpMethod() {

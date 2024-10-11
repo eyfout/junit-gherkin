@@ -29,6 +29,7 @@ class CascadeWhenTests {
             it.GETManufacturerAnswer(null) {
                 HttpResponse.unauthorized()
             }
+
             it.GETVehiclesAnswer(null, null) {
                 HttpResponse.unauthorized()
             }

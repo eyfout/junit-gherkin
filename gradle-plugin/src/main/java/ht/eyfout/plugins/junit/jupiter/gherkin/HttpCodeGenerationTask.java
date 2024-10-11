@@ -17,9 +17,7 @@ import java.io.IOException;
 abstract class HttpCodeGenerationTask extends DefaultTask {
 
     @Inject
-    public HttpCodeGenerationTask() {
-
-    }
+    public HttpCodeGenerationTask() {}
 
     @Input
     private String specsDir = "resources/junit-gherkin";
