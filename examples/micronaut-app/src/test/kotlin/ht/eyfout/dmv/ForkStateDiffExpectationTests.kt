@@ -3,7 +3,7 @@ package ht.eyfout.dmv
 import ht.eyfout.example.client.dmv.DMVClient
 import ht.eyfout.example.client.dmv.Vehicle
 import ht.eyfout.example.client.dmv.VehicleManufacturer
-import ht.eyfout.dmv.http.ExampleStateScopeProvider
+import ht.eyfout.dmv.http.DMVStateScopeProvider
 import ht.eyfout.example.controller.VehiclesController
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
@@ -22,7 +22,7 @@ class ForkStateDiffExpectationTests {
     val dmvClient: DMVClient = mockk()
 
     @Inject
-    lateinit var provider: ExampleStateScopeProvider
+    lateinit var provider: DMVStateScopeProvider
 
     @TestFactory
     fun `nissan inventory`() = GherkinDynamicTest

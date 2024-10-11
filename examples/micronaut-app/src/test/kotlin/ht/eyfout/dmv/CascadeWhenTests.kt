@@ -1,7 +1,7 @@
 package ht.eyfout.dmv
 
 import ht.eyfout.example.client.dmv.DMVClient
-import ht.eyfout.dmv.http.ExampleStateScopeProvider
+import ht.eyfout.dmv.http.DMVStateScopeProvider
 import ht.eyfout.example.controller.VehiclesController
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
@@ -20,7 +20,7 @@ class CascadeWhenTests {
     val dmvClient: DMVClient = mockk()
 
     @Inject
-    lateinit var provider: ExampleStateScopeProvider
+    lateinit var provider: DMVStateScopeProvider
 
     @TestFactory
     fun `cascaded when`() = GherkinDynamicTest

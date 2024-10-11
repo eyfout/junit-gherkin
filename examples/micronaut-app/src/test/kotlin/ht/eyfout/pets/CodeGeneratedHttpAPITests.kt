@@ -4,7 +4,7 @@ import ht.eyfout.example.client.pets.PetClient
 import ht.eyfout.example.controller.PetsController
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import ht.eyfout.junit.jupiter.gherkin.http.generated.warehouse.GETloginUserHttpAPI
-import ht.eyfout.pets.http.ExampleStateScopeProvider
+import ht.eyfout.pets.http.PetsStateScopeProvider
 import io.micronaut.http.HttpResponse
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -20,7 +20,7 @@ class CodeGeneratedHttpAPITests {
     val petClient: PetClient = mockk()
 
     @Inject
-    lateinit var provider: ExampleStateScopeProvider
+    lateinit var provider: PetsStateScopeProvider
 
     @TestFactory
     fun user() = GherkinDynamicTest.dynamicTest(provider)
