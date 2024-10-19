@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 @Generated("junit-gherkin")
-final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjCGHttpAPI.RequestBuilder.HeaderParam, GjCGHttpAPI.RequestBuilder.PathParam, GjCGHttpAPI.RequestBuilder.QueryParam>> {
+final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjCGHttpAPI.HeaderParam, GjCGHttpAPI.PathParam, GjCGHttpAPI.QueryParam>> {
     public static final GjCGHttpAPI INSTANCE = new GjCGHttpAPI();
 
     @Override
@@ -28,14 +28,18 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
     }
 
     @Override
-    public RequestBuilder<RequestBuilder.HeaderParam, RequestBuilder.PathParam, RequestBuilder.QueryParam> builder(GivenState givenState) {
+    public RequestBuilder<HeaderParam, PathParam, QueryParam> builder(GivenState givenState) {
         return new RequestBuilder<>(this, givenState);
     }
 
+    public interface Param {
+        void requiredParams(HttpAPIRequestBuilder builder);
+    }
+
     @Generated("junit-gherkin")
-    static final public class RequestBuilder<H extends RequestBuilder.HeaderParam,
-            P extends RequestBuilder.PathParam,
-            Q extends RequestBuilder.QueryParam> extends HttpAPIRequestBuilder {
+    static final public class RequestBuilder<H extends HeaderParam,
+            P extends PathParam,
+            Q extends QueryParam> extends HttpAPIRequestBuilder {
         public RequestBuilder(GjCGHttpAPI api, GivenState givenState) {
             super(api, givenState);
         }
@@ -58,52 +62,49 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
             return this;
         }
 
-        public interface Param {
-            void requiredParams(HttpAPIRequestBuilder builder);
+    }
+
+    @Generated("junit-gherkin")
+    final static public class HeaderParam implements Param {
+        private final HttpAPIRequestBuilder builder;
+
+        public HeaderParam(RequestBuilder<?, ?, ?> builder) {
+            this.builder = builder;
+            this.builder.requireThat(this::requiredParams);
         }
 
-        @Generated("junit-gherkin")
-        final static public class HeaderParam implements Param {
-            private final HttpAPIRequestBuilder builder;
+        @Override
+        public void requiredParams(HttpAPIRequestBuilder builder) {
 
-            public HeaderParam(RequestBuilder<?, ?, ?> builder) {
-                this.builder = builder;
-                this.builder.requireThat(this::requiredParams);
-            }
+        }
+    }
 
-            @Override
-            public void requiredParams(HttpAPIRequestBuilder builder) {
+    @Generated("junit-gherkin")
+    final static public class QueryParam implements Param {
+        private final HttpAPIRequestBuilder builder;
 
-            }
+        public QueryParam(RequestBuilder<?, ?, ?> builder) {
+            this.builder = builder;
+            this.builder.requireThat(this::requiredParams);
         }
 
-        @Generated("junit-gherkin")
-        final static public class QueryParam implements Param {
-            private final HttpAPIRequestBuilder builder;
+        @Override
+        public void requiredParams(HttpAPIRequestBuilder builder) {
+        }
+    }
 
-            public QueryParam(RequestBuilder<?, ?, ?> builder) {
-                this.builder = builder;
-                this.builder.requireThat(this::requiredParams);
-            }
+    @Generated("junit-gherkin")
+    final static public class PathParam implements Param {
+        private final HttpAPIRequestBuilder builder;
 
-            @Override
-            public void requiredParams(HttpAPIRequestBuilder builder) {
-            }
+        public PathParam(RequestBuilder<?, ?, ?> builder) {
+            this.builder = builder;
+            this.builder.requireThat(this::requiredParams);
         }
 
-        @Generated("junit-gherkin")
-        final static public class PathParam implements Param {
-            private final HttpAPIRequestBuilder builder;
+        @Override
+        public void requiredParams(HttpAPIRequestBuilder builder) {
 
-            public PathParam(RequestBuilder<?, ?, ?> builder) {
-                this.builder = builder;
-                this.builder.requireThat(this::requiredParams);
-            }
-
-            @Override
-            public void requiredParams(HttpAPIRequestBuilder builder) {
-
-            }
         }
     }
 }

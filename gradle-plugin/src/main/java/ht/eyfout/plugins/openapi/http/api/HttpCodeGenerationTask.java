@@ -51,10 +51,10 @@ abstract class HttpCodeGenerationTask extends DefaultTask {
                         .generate(
                                 it -> it.rebrand(load(pkg + "GjCGHttpAPI$RequestBuilder.class"), false),
                                 it -> it.withDesc(load(pkg + "GjCGHttpAPI.class")),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$RequestBuilder$QueryParam.class"), true),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$RequestBuilder$PathParam.class"), true),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$RequestBuilder$HeaderParam.class"), true),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$RequestBuilder$Param.class"), false)
+                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$QueryParam.class"), true),
+                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$PathParam.class"), true),
+                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$HeaderParam.class"), true),
+                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$Param.class"), false)
                         ).forEach(it -> {
                             int index = it.first().lastIndexOf('/');
                             File dir = new File(outputDir.get().getAsFile(), it.first().substring(0, index));

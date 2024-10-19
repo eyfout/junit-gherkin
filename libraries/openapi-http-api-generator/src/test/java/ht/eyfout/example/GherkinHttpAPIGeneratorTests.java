@@ -48,12 +48,12 @@ public class GherkinHttpAPIGeneratorTests {
         List<Pair<String, byte[]>> petstore = GherkinHttpAPIGenerator
                 .codeGen(petStore.toString(), "teach")
                 .generate(
-//                        it -> it.withDesc(asByte(GjCGHttpAPI.class)),
-//                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.class), false),
-//                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.HeaderParam.class), true),
-//                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.PathParam.class), true),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.QueryParam.class), true),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.Param.class), false)
+                        it -> it.withDesc(asByte(GjCGHttpAPI.class)),
+                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.class), false),
+                        it -> it.rebrand(asByte(GjCGHttpAPI.HeaderParam.class), true),
+                        it -> it.rebrand(asByte(GjCGHttpAPI.PathParam.class), true),
+                        it -> it.rebrand(asByte(GjCGHttpAPI.QueryParam.class), true),
+                        it -> it.rebrand(asByte(GjCGHttpAPI.Param.class), false)
                 ).toList();
         File rootDir = new File(new File("").getAbsolutePath(), "/build/generated/classes");
         rootDir.mkdirs();

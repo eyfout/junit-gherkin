@@ -142,7 +142,7 @@ class HttpParamClassVisitor extends ClassVisitor {
 
         String method() {
             try {
-                return GjCGHttpAPI.RequestBuilder.Param.class.getMethod(methodName, types).getName();
+                return GjCGHttpAPI.Param.class.getMethod(methodName, types).getName();
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(methodName, e);
             }

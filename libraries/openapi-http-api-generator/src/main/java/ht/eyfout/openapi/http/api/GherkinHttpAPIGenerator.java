@@ -30,7 +30,7 @@ final public class GherkinHttpAPIGenerator {
     }
 
     /**
-     * Replace prefix in str with with
+     * Replace prefix in str with
      *
      * @param namespace
      * @param str
@@ -66,14 +66,10 @@ final public class GherkinHttpAPIGenerator {
     static public void generate(String url, File rootDir, String namespace) {
         codeGen(url, namespace).generate(it -> {
                     it.setPrefix("GjCG");
-                    Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGHttpAPI.RequestBuilder.class.getDeclaredClasses()).flatMap(klass ->
-                            it.rebrand(bytes(klass), true)
+                    Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGHttpAPI.class.getDeclaredClasses()).flatMap(klass ->
+                            it.rebrand(bytes(klass),  klass.getSimpleName().toLowerCase().contains("param"))
                     );
-                    Stream<Pair<String, byte[]>> apis = Stream.concat(
-                            it.rebrand(bytes(GjCGHttpAPI.RequestBuilder.class), false),
-                            it.withDesc(bytes(GjCGHttpAPI.class))
-                    );
-                    return Stream.concat(apis, parameters);
+                    return Stream.concat(it.withDesc(bytes(GjCGHttpAPI.class)), parameters);
                 })
                 .forEach(it -> {
                     int index = it.first().lastIndexOf('/');
