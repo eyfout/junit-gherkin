@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(":libraries:gherkin-http-api-generator")
+    implementation project(":libraries:openapi-http-api-generator")
     testImplementation(platform(libs.junit.jupiter))
     testImplementation(libs.junit.jupiter.engine)
 }
@@ -15,8 +15,8 @@ dependencies {
 gradlePlugin {
     plugins {
         junitGherkinHttpPlugin {
-            id = 'ht.eyfout.junit.gherkin.http'
-            implementationClass = 'ht.eyfout.plugins.junit.jupiter.gherkin.HttpCodeGeneratorPlugin'
+            id = 'ht.eyfout.openapi.http.api'
+            implementationClass = 'ht.eyfout.plugins.openapi.http.api.HttpCodeGeneratorPlugin'
         }
     }
 }

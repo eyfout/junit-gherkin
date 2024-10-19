@@ -4,7 +4,7 @@ import ht.eyfout.example.client.pets.PetClient
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder
-import ht.eyfout.junit.jupiter.gherkin.http.generated.warehouse.GETloginUserHttpAPI
+import ht.eyfout.openapi.http.api.generated.warehouse.GETloginUserHttpAPI
 import io.micronaut.http.HttpResponse
 import io.mockk.every
 
@@ -14,12 +14,12 @@ class PetGivenState(private val client: PetClient) : GivenState() {
     }
     fun <B: HttpAPIRequestBuilder, T> returns(builder: B, response: HttpResponse<T?>){
         when (builder.api) {
-            GETloginUserHttpAPI::class -> {
+            is GETloginUserHttpAPI -> {
                 every {
                     client.userLogin(builder.queryParam("username"), builder.queryParam("password"))
                 } returns response as HttpResponse<String>
             }
-            else -> throw IllegalArgumentException("")
+            else -> throw IllegalArgumentException(builder.api.javaClass.name)
         }
     }
 

@@ -8,8 +8,8 @@ pluginManagement {
 
 
 include(":libraries:junit-gherkin")
-include(":libraries:gherkin-http-provider")
-include(":libraries:gherkin-http-api-generator")
+include(":libraries:http-api-provider")
+include(":libraries:openapi-http-api-generator")
 include(":gradle-plugin")
 
 

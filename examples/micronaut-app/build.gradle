@@ -6,7 +6,7 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.25-1.0.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.micronaut.application") version "4.4.2"
-    id("ht.eyfout.junit.gherkin.http") version "0.0.1"
+    id("ht.eyfout.openapi.http.api") version "0.0.1"
 //    id("io.micronaut.aot") version "4.4.2"
 }
 
@@ -41,22 +41,12 @@ application {
 java {
     sourceCompatibility = JavaVersion.toVersion("18")
 }
-//
-//sourceSets {
-//    main {
-//        output.dir("${buildDir}/generated/junit-gherkin/main/classes")
-//    }
-//}
 
 tasks.configureEach { task ->
     if(task.name == "kspKotlin"){
-        task.dependsOn(tasks.named("junitGherkinHttpCodeGen"))
+        task.dependsOn(tasks.named("openapiHttpAPI"))
     }
 }
-
-//tasks.getByName("kspKotlin", {
-//    mustRunAfter(junitGherkinHttpCodeGen)
-//})
 
 test {
     useJUnitPlatform {
