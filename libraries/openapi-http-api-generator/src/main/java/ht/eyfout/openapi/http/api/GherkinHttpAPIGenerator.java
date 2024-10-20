@@ -160,22 +160,22 @@ final public class GherkinHttpAPIGenerator {
         }
 
         public final Stream<Pair<String, byte[]>> generate(ClassLoader cl) {
-            String apiClass = "ht.eyfout.openapi.http.api.generated.GjCGHttpAPI".replace('.', '/');
-            Stream<Pair<String, byte[]>> api = generate(it -> it.withDesc(readAllBytes(cl, apiClass)));
-            Stream<Pair<String, byte[]>> resources = Stream.of(
-                    apiClass + "$QueryParam",
-                    apiClass + "$PathParam",
-                    apiClass + "$HeaderParam",
-                    apiClass + "$Param",
-                    apiClass + "$RequestBuilder").flatMap(klass ->
-                    generate(it -> it.rebrand(readAllBytes(cl, klass), klass.toLowerCase().contains("param")))
-            );
-            return Stream.concat(api, resources);
+            String api = "ht.eyfout.openapi.http.api.generated.GjCGHttpAPI";
+            try {
+                Class<?> apiClass = Class.forName(api, false, cl);
+                Stream<Pair<String, byte[]>> apis = generate(it -> it.withDesc(readAllBytes(cl, apiClass.getName())));
+                Stream<Pair<String, byte[]>> resources = Arrays.stream(apiClass.getDeclaredClasses()).flatMap(klass ->
+                        generate(it -> it.rebrand(readAllBytes(cl, klass.getName()), klass.getSimpleName().toLowerCase().contains("param")))
+                );
+                return Stream.concat(apis, resources);
+            } catch (ClassNotFoundException e) {
+                throw new GherkinHttpAPIGenerationException(api, e);
+            }
         }
 
         private byte[] readAllBytes(ClassLoader cl, String name) {
             try {
-                return Objects.requireNonNull(cl.getResourceAsStream(name + ".class")).readAllBytes();
+                return Objects.requireNonNull(cl.getResourceAsStream(name.replace('.', '/') + ".class")).readAllBytes();
             } catch (Throwable e) {
                 throw new GherkinHttpAPIGenerationException(name, e);
             }

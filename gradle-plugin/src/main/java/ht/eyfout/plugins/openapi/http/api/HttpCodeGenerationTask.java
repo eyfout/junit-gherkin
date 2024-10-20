@@ -1,6 +1,5 @@
 package ht.eyfout.plugins.openapi.http.api;
 
-import ht.eyfout.openapi.http.api.GherkinHttpAPIGenerationException;
 import ht.eyfout.openapi.http.api.GherkinHttpAPIGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.Directory;
