@@ -67,7 +67,7 @@ final public class GherkinHttpAPIGenerator {
         codeGen(url, namespace).generate(it -> {
                     it.setPrefix("GjCG");
                     Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGHttpAPI.class.getDeclaredClasses()).flatMap(klass ->
-                            it.rebrand(bytes(klass),  klass.getSimpleName().toLowerCase().contains("param"))
+                            it.rebrand(bytes(klass), klass.getSimpleName().toLowerCase().contains("param"))
                     );
                     return Stream.concat(it.withDesc(bytes(GjCGHttpAPI.class)), parameters);
                 })
@@ -157,6 +157,28 @@ final public class GherkinHttpAPIGenerator {
         @SafeVarargs
         public final Stream<Pair<String, byte[]>> generate(Function<CodeGenerator, Stream<Pair<String, byte[]>>>... consumer) {
             return Arrays.stream(consumer).flatMap(it -> it.apply(this));
+        }
+
+        public final Stream<Pair<String, byte[]>> generate(ClassLoader cl) {
+            String apiClass = "ht.eyfout.openapi.http.api.generated.GjCGHttpAPI".replace('.', '/');
+            Stream<Pair<String, byte[]>> api = generate(it -> it.withDesc(readAllBytes(cl, apiClass)));
+            Stream<Pair<String, byte[]>> resources = Stream.of(
+                    apiClass + "$QueryParam",
+                    apiClass + "$PathParam",
+                    apiClass + "$HeaderParam",
+                    apiClass + "$Param",
+                    apiClass + "$RequestBuilder").flatMap(klass ->
+                    generate(it -> it.rebrand(readAllBytes(cl, klass), klass.toLowerCase().contains("param")))
+            );
+            return Stream.concat(api, resources);
+        }
+
+        private byte[] readAllBytes(ClassLoader cl, String name) {
+            try {
+                return Objects.requireNonNull(cl.getResourceAsStream(name + ".class")).readAllBytes();
+            } catch (Throwable e) {
+                throw new GherkinHttpAPIGenerationException(name, e);
+            }
         }
     }
 }

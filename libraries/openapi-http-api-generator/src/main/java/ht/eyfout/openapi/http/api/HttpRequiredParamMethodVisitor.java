@@ -44,7 +44,7 @@ public class HttpRequiredParamMethodVisitor extends MethodVisitor {
                         Type.getMethodDescriptor(Type.getType(Object.class), Type.getType(String.class)),
                         false);
                 super.visitLdcInsn(it.getName());
-                super.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                super.visitMethodInsn(Opcodes.INVOKESTATIC,
                         Type.getType(Objects.class).getInternalName(),
                         "requireNonNull",
                         Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Object.class), Type.getType(String.class)),

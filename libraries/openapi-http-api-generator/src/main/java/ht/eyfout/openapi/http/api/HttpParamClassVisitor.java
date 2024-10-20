@@ -103,17 +103,17 @@ class HttpParamClassVisitor extends ClassVisitor {
 
         params.forEach(it -> {
             Class<?> paramType = type(it.getSchema());
+            String paramName = param(it.getName());
             MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
                     "set" + GherkinHttpAPIGenerator.camelCase(it.getName()),
                     Type.getMethodDescriptor(Type.getType(void.class), Type.getType(paramType)),
                     null,
                     null);
-            String name = it.getName().replace('-', '_');
             mv.visitCode();
-            mv.visitParameter(name, Opcodes.ACC_SYNTHETIC);
+            mv.visitParameter(paramName, Opcodes.ACC_SYNTHETIC);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, className, builder.second(), builder.first());
-            mv.visitLdcInsn(name);
+            mv.visitLdcInsn(paramName);
             mv.visitVarInsn(load(paramType), 1);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner.getInternalName(),
                     aliasForIn.get(it.getIn().toLowerCase()),
@@ -128,6 +128,9 @@ class HttpParamClassVisitor extends ClassVisitor {
 
     String rename(String other) {
         return rename.apply(other);
+    }
+    String param(String name){
+        return name.replace('-', '_');
     }
 
     enum HttpParamMethod {

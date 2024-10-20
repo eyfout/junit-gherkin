@@ -17,7 +17,8 @@ import java.io.IOException;
 abstract class HttpCodeGenerationTask extends DefaultTask {
 
     @Inject
-    public HttpCodeGenerationTask() {}
+    public HttpCodeGenerationTask() {
+    }
 
     @Input
     private String specsDir = "resources/junit-gherkin";
@@ -26,19 +27,8 @@ abstract class HttpCodeGenerationTask extends DefaultTask {
 
     private String sourceSet;
 
-
-    byte[] load(String klass) {
-        try {
-            return getClass().getClassLoader().getResourceAsStream(klass).readAllBytes();
-        } catch (IOException e) {
-            throw new GherkinHttpAPIGenerationException(klass, e);
-        }
-    }
-
-
     @TaskAction
     void action() {
-        String pkg = "ht/eyfout/openapi/http/api/generated/";
         Directory specsDir = getProject().getLayout().getProjectDirectory().dir(getSpecsDir());
         if (specsDir.getAsFile().exists()) {
             specsDir.getAsFileTree().forEach(openAPI -> {
@@ -48,14 +38,8 @@ abstract class HttpCodeGenerationTask extends DefaultTask {
                     namespace = namespace.substring(0, fileExtension);
                 }
                 GherkinHttpAPIGenerator.codeGen(openAPI.getAbsolutePath(), namespace)
-                        .generate(
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$RequestBuilder.class"), false),
-                                it -> it.withDesc(load(pkg + "GjCGHttpAPI.class")),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$QueryParam.class"), true),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$PathParam.class"), true),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$HeaderParam.class"), true),
-                                it -> it.rebrand(load(pkg + "GjCGHttpAPI$Param.class"), false)
-                        ).forEach(it -> {
+                        .generate(getClass().getClassLoader())
+                        .forEach(it -> {
                             int index = it.first().lastIndexOf('/');
                             File dir = new File(outputDir.get().getAsFile(), it.first().substring(0, index));
                             dir.mkdirs();
