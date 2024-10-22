@@ -1,7 +1,8 @@
 package ht.eyfout.example.controller
 
 import ht.eyfout.example.client.pets.PetClient
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpEndpoint
+import ht.eyfout.http.HttpEndpoint
+import ht.eyfout.http.HttpRequestBuilder
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -11,7 +12,7 @@ import java.util.*
 @Controller
 class PetsController(private val client: PetClient) {
 
-    enum class APIEndpoint : HttpEndpoint {
+    enum class APIEndpoint : HttpEndpoint<HttpRequestBuilder> {
         UserInfo {
             override fun getHttpMethod(): String = "GET"
             override fun getBasePath(): String = "v1/users/{userID}"

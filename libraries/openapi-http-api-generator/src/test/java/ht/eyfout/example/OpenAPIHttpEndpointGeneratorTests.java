@@ -1,8 +1,8 @@
 package ht.eyfout.example;
 
-import ht.eyfout.openapi.http.api.GherkinHttpAPIGenerator;
-import ht.eyfout.openapi.http.api.Pair;
-import ht.eyfout.openapi.http.api.generated.GjCGHttpAPI;
+import ht.eyfout.openapi.http.generator.OpenAPIHttpEndpointGenerator;
+import ht.eyfout.openapi.http.generator.Pair;
+import ht.eyfout.http.openapi.generated.GjCGHttpEndpoint;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -13,21 +13,21 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GherkinHttpAPIGeneratorTests {
+public class OpenAPIHttpEndpointGeneratorTests {
 
     @Test
     /**
-     * Generates the data structures relative to {@link GherkinHttpAPIGenerator} package, followed by generate/{namespace}.
+     * Generates the data structures relative to {@link OpenAPIHttpEndpointGenerator} package, followed by generate/{namespace}.
      */
     void genCode() {
-        URL petStore = GherkinHttpAPIGeneratorTests.class.getClassLoader().getResource("pet-store.yml");
-        URL supplyWarehouse = GherkinHttpAPIGeneratorTests.class.getClassLoader().getResource("supply-warehouse.yml");
+        URL petStore = OpenAPIHttpEndpointGeneratorTests.class.getClassLoader().getResource("pet-store.yml");
+        URL supplyWarehouse = OpenAPIHttpEndpointGeneratorTests.class.getClassLoader().getResource("supply-warehouse.yml");
         File rootDir = new File(new File("").getAbsolutePath(), "/build/generated/classes");
         rootDir.mkdirs();
-        GherkinHttpAPIGenerator.generate(petStore.toString(), rootDir, "petstore");
-        GherkinHttpAPIGenerator.generate(supplyWarehouse.toString(), rootDir, "warehouse");
+        OpenAPIHttpEndpointGenerator.generate(petStore.toString(), rootDir, "petstore");
+        OpenAPIHttpEndpointGenerator.generate(supplyWarehouse.toString(), rootDir, "warehouse");
 
-        File destination = new File(rootDir, GherkinHttpAPIGenerator.class.getPackageName().replace('.', File.separatorChar));
+        File destination = new File(rootDir, OpenAPIHttpEndpointGenerator.class.getPackageName().replace('.', File.separatorChar));
         assertTrue(new File(destination, "generated/petstore").exists(), "petstore @" + destination.getAbsolutePath());
         assertTrue(new File(destination, "generated/warehouse").exists(), "warehouse @" + destination.getAbsolutePath());
     }
@@ -44,16 +44,16 @@ public class GherkinHttpAPIGeneratorTests {
 
     @Test
     void genCodeExplicitly() {
-        URL petStore = GherkinHttpAPIGeneratorTests.class.getClassLoader().getResource("pet-store.yml");
-        List<Pair<String, byte[]>> petstore = GherkinHttpAPIGenerator
+        URL petStore = OpenAPIHttpEndpointGeneratorTests.class.getClassLoader().getResource("pet-store.yml");
+        List<Pair<String, byte[]>> petstore = OpenAPIHttpEndpointGenerator
                 .codeGen(petStore.toString(), "teach")
                 .generate(
-                        it -> it.withDesc(asByte(GjCGHttpAPI.class)),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.RequestBuilder.class), false),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.HeaderParam.class), true),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.PathParam.class), true),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.QueryParam.class), true),
-                        it -> it.rebrand(asByte(GjCGHttpAPI.Param.class), false)
+                        it -> it.withDesc(asByte(GjCGHttpEndpoint.class)),
+                        it -> it.rebrand(asByte(GjCGHttpEndpoint.RequestBuilder.class), false),
+                        it -> it.rebrand(asByte(GjCGHttpEndpoint.HeaderParam.class), true),
+                        it -> it.rebrand(asByte(GjCGHttpEndpoint.PathParam.class), true),
+                        it -> it.rebrand(asByte(GjCGHttpEndpoint.QueryParam.class), true),
+                        it -> it.rebrand(asByte(GjCGHttpEndpoint.Param.class), false)
                 ).toList();
         File rootDir = new File(new File("").getAbsolutePath(), "/build/generated/classes");
         rootDir.mkdirs();

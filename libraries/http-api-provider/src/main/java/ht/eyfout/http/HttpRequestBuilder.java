@@ -1,4 +1,4 @@
-package ht.eyfout.junit.jupiter.gherkin.api.http;
+package ht.eyfout.http;
 
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 
@@ -6,59 +6,59 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class HttpAPIRequestBuilder {
+public class HttpRequestBuilder {
+    public final HttpEndpoint<? extends HttpRequestBuilder> api;
     final private Map<String, Object> headers = new HashMap<>();
     final private Map<String, Object> queryParams = new HashMap<>();
     final private Map<String, Object> pathParams = new HashMap<>();
-    private Optional<Object> body = Optional.empty();
     final private Optional<GivenState> givenState;
-    public final HttpAPI<? extends HttpAPIRequestBuilder> api;
-    private List<Consumer<HttpAPIRequestBuilder>> requiredChecks = new ArrayList<>();
+    private Optional<Object> body = Optional.empty();
+    private final List<Consumer<HttpRequestBuilder>> requiredChecks = new ArrayList<>();
 
-    public HttpAPIRequestBuilder(HttpAPI<? extends HttpAPIRequestBuilder> api, GivenState givenState) {
+    public HttpRequestBuilder(HttpEndpoint<? extends HttpRequestBuilder> api, GivenState givenState) {
         this.api = api;
         this.givenState = Optional.ofNullable(givenState);
     }
 
-    public HttpAPIRequestBuilder header(String key, Object value) {
+    public HttpRequestBuilder header(String key, Object value) {
         headers.put(key, value);
         return this;
     }
 
-    public HttpAPIRequestBuilder queryParam(String key, Object value) {
+    public HttpRequestBuilder queryParam(String key, Object value) {
         queryParams.put(key, value);
         return this;
     }
 
-    public HttpAPIRequestBuilder pathParam(String key, Object value) {
+    public HttpRequestBuilder pathParam(String key, Object value) {
         pathParams.put(key, value);
         return this;
     }
 
     public <R> R pathParam(String key) {
-        return (R)pathParams.get(key);
+        return (R) pathParams.get(key);
     }
 
     public <R> R queryParam(String key) {
-        return (R)queryParams.get(key);
+        return (R) queryParams.get(key);
     }
 
     public <R> R header(String key) {
-        return (R)header(key);
+        return header(key);
     }
 
-    public HttpAPIRequestBuilder body(Object body) {
+    public HttpRequestBuilder body(Object body) {
         this.body = Optional.ofNullable(body);
         return this;
     }
 
-    Map<String, Object> getPathParams() {
+    public Map<String, Object> getPathParams() {
         Map<String, Object> params = pathParamFromGiven();
         params.putAll(pathParams);
         return params;
     }
 
-    public void requireThat(Consumer<HttpAPIRequestBuilder> requiredCheck) {
+    public void requireThat(Consumer<HttpRequestBuilder> requiredCheck) {
         this.requiredChecks.add(requiredCheck);
     }
 
@@ -73,7 +73,7 @@ public class HttpAPIRequestBuilder {
         return headers;
     }
 
-    Map<String, Object> getQueryParams() {
+    public Map<String, Object> getQueryParams() {
         return queryParams;
     }
 
@@ -94,7 +94,7 @@ public class HttpAPIRequestBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    <Exec extends HttpAPIRequestExecutor> Exec execute() {
-        return (Exec) new HttpAPIRequestExecutor(api, this);
+    <Exec extends HttpRequestExecutor> Exec execute() {
+        return (Exec) new HttpRequestExecutor(api, this);
     }
 }

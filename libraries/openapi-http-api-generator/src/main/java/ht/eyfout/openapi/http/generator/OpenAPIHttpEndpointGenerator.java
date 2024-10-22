@@ -1,6 +1,6 @@
-package ht.eyfout.openapi.http.api;
+package ht.eyfout.openapi.http.generator;
 
-import ht.eyfout.openapi.http.api.generated.GjCGHttpAPI;
+import ht.eyfout.http.openapi.generated.GjCGHttpEndpoint;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-final public class GherkinHttpAPIGenerator {
+final public class OpenAPIHttpEndpointGenerator {
     public static String camelCase(String it) {
         return it.toUpperCase().charAt(0) + it.substring(1);
     }
@@ -25,7 +25,7 @@ final public class GherkinHttpAPIGenerator {
         try {
             return klass.getClassLoader().getResourceAsStream(klass.getName().replace('.', '/') + ".class").readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(klass.getName(), e);
+            throw new OpenAPIHttpEndpointGenerationException(klass.getName(), e);
         }
     }
 
@@ -66,10 +66,10 @@ final public class GherkinHttpAPIGenerator {
     static public void generate(String url, File rootDir, String namespace) {
         codeGen(url, namespace).generate(it -> {
                     it.setPrefix("GjCG");
-                    Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGHttpAPI.class.getDeclaredClasses()).flatMap(klass ->
+                    Stream<Pair<String, byte[]>> parameters = Arrays.stream(GjCGHttpEndpoint.class.getDeclaredClasses()).flatMap(klass ->
                             it.rebrand(bytes(klass), klass.getSimpleName().toLowerCase().contains("param"))
                     );
-                    return Stream.concat(it.withDesc(bytes(GjCGHttpAPI.class)), parameters);
+                    return Stream.concat(it.withDesc(bytes(GjCGHttpEndpoint.class)), parameters);
                 })
                 .forEach(it -> {
                     int index = it.first().lastIndexOf('/');
@@ -148,7 +148,7 @@ final public class GherkinHttpAPIGenerator {
                 Function<String, String> rename = it -> replace(namespace, it, prefix, api.id());
                 ClassReader reader = new ClassReader(template);
                 ClassWriter sink = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-                HttpClassVisitor visitor = new HttpClassVisitor(Opcodes.ASM9, sink, rename, (n, d, v) -> new HttpAPIMethodVisitor(Opcodes.ASM7, v, api, n, rename));
+                HttpClassVisitor visitor = new HttpClassVisitor(Opcodes.ASM9, sink, rename, (n, d, v) -> new HttpEndpointMethodVisitor(Opcodes.ASM7, v, api, n, rename));
                 reader.accept(visitor, ClassReader.EXPAND_FRAMES);
                 return new Pair<>(visitor.name().get(), sink.toByteArray());
             });
@@ -160,7 +160,7 @@ final public class GherkinHttpAPIGenerator {
         }
 
         public final Stream<Pair<String, byte[]>> generate(ClassLoader cl) {
-            String api = "ht.eyfout.openapi.http.api.generated.GjCGHttpAPI";
+            String api = "ht.eyfout.http.openapi.generated.GjCGHttpEndpoint";
             try {
                 Class<?> apiClass = Class.forName(api, false, cl);
                 Stream<Pair<String, byte[]>> apis = generate(it -> it.withDesc(readAllBytes(cl, apiClass.getName())));
@@ -169,7 +169,7 @@ final public class GherkinHttpAPIGenerator {
                 );
                 return Stream.concat(apis, resources);
             } catch (ClassNotFoundException e) {
-                throw new GherkinHttpAPIGenerationException(api, e);
+                throw new OpenAPIHttpEndpointGenerationException(api, e);
             }
         }
 
@@ -177,7 +177,7 @@ final public class GherkinHttpAPIGenerator {
             try {
                 return Objects.requireNonNull(cl.getResourceAsStream(name.replace('.', '/') + ".class")).readAllBytes();
             } catch (Throwable e) {
-                throw new GherkinHttpAPIGenerationException(name, e);
+                throw new OpenAPIHttpEndpointGenerationException(name, e);
             }
         }
     }

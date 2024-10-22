@@ -1,16 +1,16 @@
-package ht.eyfout.openapi.http.api.generated;
+package ht.eyfout.http.openapi.generated;
 
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPI;
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder;
+import ht.eyfout.http.HttpEndpoint;
+import ht.eyfout.http.HttpRequestBuilder;
 
 import javax.annotation.processing.Generated;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 @Generated("junit-gherkin")
-final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjCGHttpAPI.HeaderParam, GjCGHttpAPI.PathParam, GjCGHttpAPI.QueryParam>> {
-    public static final GjCGHttpAPI INSTANCE = new GjCGHttpAPI();
+final public class GjCGHttpEndpoint implements HttpEndpoint<GjCGHttpEndpoint.RequestBuilder<GjCGHttpEndpoint.HeaderParam, GjCGHttpEndpoint.PathParam, GjCGHttpEndpoint.QueryParam>> {
+    public static final GjCGHttpEndpoint INSTANCE = new GjCGHttpEndpoint();
 
     @Override
     public String getHttpMethod() {
@@ -33,14 +33,14 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
     }
 
     public interface Param {
-        void requiredParams(HttpAPIRequestBuilder builder);
+        void requiredParams(HttpRequestBuilder builder);
     }
 
     @Generated("junit-gherkin")
     static final public class RequestBuilder<H extends HeaderParam,
             P extends PathParam,
-            Q extends QueryParam> extends HttpAPIRequestBuilder {
-        public RequestBuilder(GjCGHttpAPI api, GivenState givenState) {
+            Q extends QueryParam> extends HttpRequestBuilder {
+        public RequestBuilder(GjCGHttpEndpoint api, GivenState givenState) {
             super(api, givenState);
         }
 
@@ -66,7 +66,7 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
 
     @Generated("junit-gherkin")
     final static public class HeaderParam implements Param {
-        private final HttpAPIRequestBuilder builder;
+        private final HttpRequestBuilder builder;
 
         public HeaderParam(RequestBuilder<?, ?, ?> builder) {
             this.builder = builder;
@@ -74,14 +74,14 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
         }
 
         @Override
-        public void requiredParams(HttpAPIRequestBuilder builder) {
+        public void requiredParams(HttpRequestBuilder builder) {
 
         }
     }
 
     @Generated("junit-gherkin")
     final static public class QueryParam implements Param {
-        private final HttpAPIRequestBuilder builder;
+        private final HttpRequestBuilder builder;
 
         public QueryParam(RequestBuilder<?, ?, ?> builder) {
             this.builder = builder;
@@ -89,13 +89,13 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
         }
 
         @Override
-        public void requiredParams(HttpAPIRequestBuilder builder) {
+        public void requiredParams(HttpRequestBuilder builder) {
         }
     }
 
     @Generated("junit-gherkin")
     final static public class PathParam implements Param {
-        private final HttpAPIRequestBuilder builder;
+        private final HttpRequestBuilder builder;
 
         public PathParam(RequestBuilder<?, ?, ?> builder) {
             this.builder = builder;
@@ -103,7 +103,7 @@ final public class GjCGHttpAPI implements HttpAPI<GjCGHttpAPI.RequestBuilder<GjC
         }
 
         @Override
-        public void requiredParams(HttpAPIRequestBuilder builder) {
+        public void requiredParams(HttpRequestBuilder builder) {
 
         }
     }

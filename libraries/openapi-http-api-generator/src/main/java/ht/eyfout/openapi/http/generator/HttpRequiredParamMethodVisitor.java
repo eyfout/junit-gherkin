@@ -1,4 +1,4 @@
-package ht.eyfout.openapi.http.api;
+package ht.eyfout.openapi.http.generator;
 
 import io.swagger.v3.oas.models.parameters.Parameter;
 import org.objectweb.asm.MethodVisitor;
@@ -8,7 +8,7 @@ import org.objectweb.asm.Type;
 import java.util.Collection;
 import java.util.Objects;
 
-public class HttpRequiredParamMethodVisitor extends MethodVisitor {
+class HttpRequiredParamMethodVisitor extends MethodVisitor {
     private final String owner;
     private final String builderClass;
     /**

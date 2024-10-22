@@ -1,7 +1,7 @@
-package ht.eyfout.openapi.http.api;
+package ht.eyfout.openapi.http.generator;
 
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpAPIRequestBuilder;
-import ht.eyfout.openapi.http.api.generated.GjCGHttpAPI;
+import ht.eyfout.http.HttpRequestBuilder;
+import ht.eyfout.http.openapi.generated.GjCGHttpEndpoint;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import org.objectweb.asm.*;
@@ -29,7 +29,7 @@ class HttpParamClassVisitor extends ClassVisitor {
     HttpParamClassVisitor(int api, ClassVisitor cv, Collection<Parameter> params, Function<String, String> rename) {
         super(api, cv);
         this.params = params;
-        builderClass = rename.apply(Type.getType(HttpAPIRequestBuilder.class).getInternalName());
+        builderClass = rename.apply(Type.getType(HttpRequestBuilder.class).getInternalName());
         this.rename = rename;
     }
 
@@ -98,18 +98,22 @@ class HttpParamClassVisitor extends ClassVisitor {
      */
     @Override
     public void visitEnd() {
-        Type owner = Type.getType(HttpAPIRequestBuilder.class);
+        Type owner = Type.getType(HttpRequestBuilder.class);
         String descriptor = Type.getMethodDescriptor(owner, Type.getType(String.class), Type.getType(Object.class));
 
         params.forEach(it -> {
             Class<?> paramType = type(it.getSchema());
             String paramName = param(it.getName());
+//            cv.visitField(Opcodes.ACC_STATIC | Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
+//                    paramName.toUpperCase(), Type.getType(String.class).getDescriptor(), null, it.getName()).visitEnd();
+
             MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
-                    "set" + GherkinHttpAPIGenerator.camelCase(it.getName()),
+                    "set" + OpenAPIHttpEndpointGenerator.camelCase(it.getName()),
                     Type.getMethodDescriptor(Type.getType(void.class), Type.getType(paramType)),
                     null,
                     null);
             mv.visitCode();
+
             mv.visitParameter(paramName, Opcodes.ACC_SYNTHETIC);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD, className, builder.second(), builder.first());
@@ -129,12 +133,13 @@ class HttpParamClassVisitor extends ClassVisitor {
     String rename(String other) {
         return rename.apply(other);
     }
-    String param(String name){
+
+    String param(String name) {
         return name.replace('-', '_');
     }
 
     enum HttpParamMethod {
-        REQUIRED_PARAMETER("requiredParams", HttpAPIRequestBuilder.class);
+        REQUIRED_PARAMETER("requiredParams", HttpRequestBuilder.class);
         private final String methodName;
         private final Class<?> types;
 
@@ -145,7 +150,7 @@ class HttpParamClassVisitor extends ClassVisitor {
 
         String method() {
             try {
-                return GjCGHttpAPI.Param.class.getMethod(methodName, types).getName();
+                return GjCGHttpEndpoint.Param.class.getMethod(methodName, types).getName();
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(methodName, e);
             }

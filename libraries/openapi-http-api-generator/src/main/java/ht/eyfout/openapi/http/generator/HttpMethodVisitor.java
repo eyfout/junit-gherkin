@@ -1,4 +1,4 @@
-package ht.eyfout.openapi.http.api;
+package ht.eyfout.openapi.http.generator;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;

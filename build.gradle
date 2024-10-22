@@ -1,5 +1,5 @@
 allprojects {
-    group "ht.eyfout.junit"
+    group "ht.eyfout"
     version "0.0.1"
 }
 subprojects {

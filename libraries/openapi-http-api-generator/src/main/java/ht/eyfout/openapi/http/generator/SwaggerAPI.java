@@ -1,4 +1,4 @@
-package ht.eyfout.openapi.http.api;
+package ht.eyfout.openapi.http.generator;
 
 
 import io.swagger.v3.oas.models.Operation;

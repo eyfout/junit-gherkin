@@ -4,8 +4,8 @@ import ht.eyfout.junit.jupiter.gherkin.api.ThenScope;
 import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 import io.restassured.response.Response;
 
-public class HttpAPIThenScope extends ThenScope {
-    HttpAPIThenScope(WhenScopeExecutor executor) {
+public class HttpThenScope extends ThenScope {
+    HttpThenScope(WhenScopeExecutor executor) {
         super(executor);
     }
 

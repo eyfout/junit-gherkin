@@ -1,6 +1,6 @@
 package ht.eyfout.plugins.openapi.http.api;
 
-import ht.eyfout.openapi.http.api.GherkinHttpAPIGenerator;
+import ht.eyfout.openapi.http.generator.OpenAPIHttpEndpointGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.Directory;
 import org.gradle.api.provider.Provider;
@@ -36,7 +36,7 @@ abstract class HttpCodeGenerationTask extends DefaultTask {
                 if (fileExtension > 0) {
                     namespace = namespace.substring(0, fileExtension);
                 }
-                GherkinHttpAPIGenerator.codeGen(openAPI.getAbsolutePath(), namespace)
+                OpenAPIHttpEndpointGenerator.codeGen(openAPI.getAbsolutePath(), namespace)
                         .generate(getClass().getClassLoader())
                         .forEach(it -> {
                             int index = it.first().lastIndexOf('/');

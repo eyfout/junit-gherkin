@@ -3,7 +3,7 @@ package ht.eyfout.pets
 import ht.eyfout.example.client.pets.PetClient
 import ht.eyfout.example.controller.PetsController
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
-import ht.eyfout.openapi.http.api.generated.warehouse.GETloginUserHttpAPI
+import ht.eyfout.http.openapi.generated.warehouse.GETloginUserHttpEndpoint
 import ht.eyfout.pets.http.PetsStateScopeProvider
 import io.micronaut.http.HttpResponse
 import io.micronaut.test.annotation.MockBean
@@ -26,7 +26,7 @@ class CodeGeneratedHttpAPITests {
     fun user() = GherkinDynamicTest.dynamicTest(provider)
         .given("eyfout profile") {
             it.returns(
-                it.httpRequest(GETloginUserHttpAPI.INSTANCE, {
+                it.httpRequest(GETloginUserHttpEndpoint.INSTANCE, {
                     it.queryParams({
                         it.setPassword("password")
                         it.setUsername("eyfout")

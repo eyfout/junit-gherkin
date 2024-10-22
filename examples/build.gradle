@@ -1,4 +1,5 @@
 subprojects {
+    group = 'ht.eyfout.example'
     repositories {
         mavenCentral()
         mavenLocal()

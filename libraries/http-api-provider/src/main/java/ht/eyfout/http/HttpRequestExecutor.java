@@ -1,45 +1,20 @@
-package ht.eyfout.junit.jupiter.gherkin.api.http;
+package ht.eyfout.http;
 
-import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
-import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.net.ConnectException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class HttpAPIRequestExecutor implements WhenScopeExecutor {
-    private final HttpAPI<?> api;
-    private final HttpAPIRequestBuilder builder;
+public class HttpRequestExecutor {
+    private final HttpEndpoint<?> api;
+    private final HttpRequestBuilder builder;
     private Response httpResponse;
 
-    HttpAPIRequestExecutor(HttpAPI<?> api, HttpAPIRequestBuilder builder) {
+    HttpRequestExecutor(HttpEndpoint<?> api, HttpRequestBuilder builder) {
         this.api = api;
         this.builder = builder;
-    }
-
-
-    @Override
-    public Optional<String> displayName() {
-        StringBuilder sb = new StringBuilder();
-
-        api.getDescription().ifPresent(it -> sb.append(" [[").append(it).append(" ]] => "));
-
-        String queryParams = "?";
-        if (!builder.getQueryParams().isEmpty()) {
-            queryParams += builder.getQueryParams().entrySet().stream()
-                    .map(it -> it.getKey() + "=" + it.getValue())
-                    .collect(Collectors.joining("&"));
-        }
-
-        sb.append(api.getHttpMethod().toUpperCase())
-                .append(" ")
-                .append(api.getBasePath())
-                .append(queryParams);
-        return Optional.of(sb.toString());
     }
 
     final protected RequestSpecification specification() {
@@ -52,7 +27,7 @@ public class HttpAPIRequestExecutor implements WhenScopeExecutor {
         return spec;
     }
 
-    @Override
+    //    @Override
     @SuppressWarnings("unchecked")
     public <R> R exec() {
         if (httpResponse == null) {

@@ -3,7 +3,8 @@ package ht.eyfout.example.controller
 import ht.eyfout.example.client.dmv.DMVClient
 import ht.eyfout.example.client.dmv.Vehicle
 import ht.eyfout.example.client.dmv.VehicleManufacturer
-import ht.eyfout.junit.jupiter.gherkin.api.http.HttpEndpoint
+import ht.eyfout.http.HttpEndpoint
+import ht.eyfout.http.HttpRequestBuilder
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
@@ -12,7 +13,7 @@ import java.util.*
 
 @Controller("v1/")
 class VehiclesController(private val dmvClient: DMVClient) {
-    enum class APIEndpoint : HttpEndpoint {
+    enum class APIEndpoint : HttpEndpoint<HttpRequestBuilder> {
         VehiclesByManufacturerID {
             override fun getHttpMethod(): String = "GET"
             override fun getBasePath(): String = "v1/manufacturers/{manufacturerID}/vehicles"
