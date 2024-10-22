@@ -3,36 +3,13 @@ package ht.eyfout.example.controller
 import ht.eyfout.example.client.dmv.DMVClient
 import ht.eyfout.example.client.dmv.Vehicle
 import ht.eyfout.example.client.dmv.VehicleManufacturer
-import ht.eyfout.http.HttpEndpoint
-import ht.eyfout.http.HttpRequestBuilder
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
-import java.util.*
 
 @Controller("v1/")
 class VehiclesController(private val dmvClient: DMVClient) {
-    enum class APIEndpoint : HttpEndpoint<HttpRequestBuilder> {
-        VehiclesByManufacturerID {
-            override fun getHttpMethod(): String = "GET"
-            override fun getBasePath(): String = "v1/manufacturers/{manufacturerID}/vehicles"
-            override fun getDescription(): Optional<String> = Optional.of("vehicles by manufacturer ID")
-        },
-        VehiclesByManufacturerName {
-            override fun getHttpMethod(): String = "GET"
-            override fun getBasePath(): String = "v1/vehicles"
-            override fun getDescription(): Optional<String> = Optional.of("vehicles by manufacturer name")
-        },
-        Manufacturers {
-            override fun getHttpMethod(): String = "GET"
-            override fun getBasePath(): String = "v1/manufacturers"
-            override fun getDescription(): Optional<String> = Optional.of("manufacturers")
-        }
-
-    }
-
-
     @Get("vehicles")
     @Produces(MediaType.APPLICATION_JSON)
     suspend fun vehicles(
@@ -46,6 +23,7 @@ class VehiclesController(private val dmvClient: DMVClient) {
             }.flatMap {
                 dmvClient.vehicles(authorization, it.id).body().stream()
             }.toList())
+
             else -> httpResponse as HttpResponse<Collection<Vehicle>>
         }
     }

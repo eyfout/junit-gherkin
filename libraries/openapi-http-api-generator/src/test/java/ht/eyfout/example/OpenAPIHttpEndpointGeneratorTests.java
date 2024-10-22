@@ -1,9 +1,8 @@
 package ht.eyfout.example;
 
-import ht.eyfout.http.HttpEndpoint;
+import ht.eyfout.http.openapi.generated.GjCGHttpEndpoint;
 import ht.eyfout.openapi.http.generator.OpenAPIHttpEndpointGenerator;
 import ht.eyfout.openapi.http.generator.Pair;
-import ht.eyfout.http.openapi.generated.GjCGHttpEndpoint;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

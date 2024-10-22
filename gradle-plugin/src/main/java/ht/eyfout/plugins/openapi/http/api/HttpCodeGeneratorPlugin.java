@@ -48,7 +48,7 @@ public class HttpCodeGeneratorPlugin implements Plugin<Project> {
                         it.setOutputDir(outputDir);
                     });
 
-            srcSet.getOutput().dir(Map.of("builtBy", myTask.getName()), myTask);
+            srcSet.getOutput().dir(Map.of("builtBy", myTask.getName()), outputDir);
 
             project.getTasks().named(srcSet.getCompileJavaTaskName()).configure(new Action<>() {
                 @Override
