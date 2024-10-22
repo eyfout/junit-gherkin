@@ -1,7 +1,3 @@
-allprojects {
-    group "ht.eyfout"
-    version "0.0.1"
-}
 subprojects {
     repositories {
         mavenLocal()

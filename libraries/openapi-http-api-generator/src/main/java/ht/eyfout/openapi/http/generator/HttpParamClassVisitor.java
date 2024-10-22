@@ -99,13 +99,15 @@ class HttpParamClassVisitor extends ClassVisitor {
     @Override
     public void visitEnd() {
         Type owner = Type.getType(HttpRequestBuilder.class);
-        String descriptor = Type.getMethodDescriptor(owner, Type.getType(String.class), Type.getType(Object.class));
+        Type str = Type.getType(String.class);
+        String descriptor = Type.getMethodDescriptor(owner, str, Type.getType(Object.class));
+
 
         params.forEach(it -> {
             Class<?> paramType = type(it.getSchema());
             String paramName = param(it.getName());
-//            cv.visitField(Opcodes.ACC_STATIC | Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
-//                    paramName.toUpperCase(), Type.getType(String.class).getDescriptor(), null, it.getName()).visitEnd();
+            cv.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
+                    paramName.toUpperCase(), str.getDescriptor(), null, null);
 
             MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
                     "set" + OpenAPIHttpEndpointGenerator.camelCase(it.getName()),
@@ -127,6 +129,16 @@ class HttpParamClassVisitor extends ClassVisitor {
             mv.visitEnd();
         });
 
+        MethodVisitor clinit = cv.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+        clinit.visitCode();
+        params.forEach(it ->{
+            clinit.visitLdcInsn(it.getName());
+            clinit.visitFieldInsn(Opcodes.PUTSTATIC, className, param(it.getName()).toUpperCase(), str.getDescriptor());
+        });
+
+        clinit.visitMaxs(0,0);
+        clinit.visitInsn(Opcodes.RETURN);
+        clinit.visitEnd();
         super.visitEnd();
     }
 

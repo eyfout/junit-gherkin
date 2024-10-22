@@ -1,5 +1,6 @@
 package ht.eyfout.example;
 
+import ht.eyfout.http.HttpEndpoint;
 import ht.eyfout.openapi.http.generator.OpenAPIHttpEndpointGenerator;
 import ht.eyfout.openapi.http.generator.Pair;
 import ht.eyfout.http.openapi.generated.GjCGHttpEndpoint;
@@ -27,9 +28,9 @@ public class OpenAPIHttpEndpointGeneratorTests {
         OpenAPIHttpEndpointGenerator.generate(petStore.toString(), rootDir, "petstore");
         OpenAPIHttpEndpointGenerator.generate(supplyWarehouse.toString(), rootDir, "warehouse");
 
-        File destination = new File(rootDir, OpenAPIHttpEndpointGenerator.class.getPackageName().replace('.', File.separatorChar));
-        assertTrue(new File(destination, "generated/petstore").exists(), "petstore @" + destination.getAbsolutePath());
-        assertTrue(new File(destination, "generated/warehouse").exists(), "warehouse @" + destination.getAbsolutePath());
+        File destination = new File(rootDir, GjCGHttpEndpoint.class.getPackageName().replace('.', File.separatorChar));
+        assertTrue(new File(destination, "petstore").exists(), "petstore @" + destination.getAbsolutePath());
+        assertTrue(new File(destination, "warehouse").exists(), "warehouse @" + destination.getAbsolutePath());
     }
 
     byte[] asByte(Class<?> klass) {

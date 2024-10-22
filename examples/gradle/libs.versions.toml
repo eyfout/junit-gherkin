@@ -5,7 +5,7 @@ mockk = "1.12.15"
 openapi-generator = "7.8.0"
 ow2-asm = "9.2"
 rest-assured = "5.5.0"
-junit-gherkin = "0.0.1"
+junit-gherkin = "0.0.1-SNAPSHOT"
 
 
 

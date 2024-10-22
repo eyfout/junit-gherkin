@@ -105,18 +105,21 @@ final public class OpenAPIHttpEndpointGenerator {
         }
 
         private static byte[] methodParams(String klass, byte[] content, SwaggerAPI api, Function<String, String> rename) {
-            ClassReader reader = new ClassReader(content);
-            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-            Collection<Parameter> parameterPairs = new ArrayList<>();
-            Optional.ofNullable(api.operation().getParameters()).ifPresent(params -> {
-                List<Parameter> pairs = params.stream()
-                        .filter(it -> it.getIn() != null && it.getName() != null)
-                        .filter(it -> klass.contains(camelCase(it.getIn())))
-                        .toList();
-                parameterPairs.addAll(pairs);
-            });
-            reader.accept(new HttpParamClassVisitor(Opcodes.ASM9, writer, parameterPairs, rename), ClassWriter.COMPUTE_FRAMES);
-            return writer.toByteArray();
+
+            Collection<Parameter> parameterPairs = Optional.ofNullable(api.operation().getParameters())
+                    .orElseGet(Collections::emptyList)
+                    .stream()
+                    .filter(it -> it.getIn() != null && it.getName() != null)
+                    .filter(it -> klass.contains(camelCase(it.getIn())))
+                    .toList();
+
+            if (!parameterPairs.isEmpty()) {
+                ClassReader reader = new ClassReader(content);
+                ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+                reader.accept(new HttpParamClassVisitor(Opcodes.ASM9, writer, parameterPairs, rename), ClassWriter.COMPUTE_FRAMES);
+                return writer.toByteArray();
+            }
+            return content;
         }
 
         public String getPrefix() {
