@@ -41,7 +41,11 @@ public class HttpWhenScope extends WhenScope {
         public Optional<String> displayName() {
             StringBuilder sb = new StringBuilder();
 
-            api.getDescription().ifPresent(it -> sb.append(" [[").append(it).append(" ]] => "));
+            api.getDescription().ifPresent(it -> {
+                if(!it.isEmpty()) {
+                    sb.append(" [[").append(it).append(" ]] => ");
+                }
+            });
 
             String queryParams = "?";
             if (!builder.getQueryParams().isEmpty()) {

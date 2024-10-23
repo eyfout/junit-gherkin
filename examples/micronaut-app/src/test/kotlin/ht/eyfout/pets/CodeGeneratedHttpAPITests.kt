@@ -24,9 +24,9 @@ class CodeGeneratedHttpAPITests {
 
     @TestFactory
     fun user() = GherkinDynamicTest.dynamicTest(provider)
-        .given("eyfout profile") {
-            it.httpRequest(GETloginUserHttpEndpoint.INSTANCE, {
-                it.queryParams({
+        .given("eyfout profile") { given ->
+            given.httpRequest(GETloginUserHttpEndpoint.INSTANCE, { httpRequest ->
+                httpRequest.queryParams({
                     it.setPassword("password")
                     it.setUsername("eyfout")
                 })

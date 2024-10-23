@@ -22,7 +22,7 @@ record SwaggerAPI(String path, PathItem.HttpMethod method, Operation operation) 
     }
 
     public String description() {
-        return Optional.ofNullable(operation.getSummary())
-                .orElseGet( () -> Optional.ofNullable(operation.getDescription()).orElseGet(() -> path));
+        return Optional.ofNullable(operation.getSummary()).orElseGet( () ->
+                Optional.ofNullable(operation.getDescription()).orElse( ""));
     }
 }

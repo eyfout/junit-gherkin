@@ -13,4 +13,3 @@ buildscript {
     }
 }
 include("micronaut-app")
-rootProject.name = "junit-gherkin-examples"
