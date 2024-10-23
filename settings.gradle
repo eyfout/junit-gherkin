@@ -13,7 +13,5 @@ include(":libraries:openapi-http-api-generator")
 include(":gradle-plugin")
 
 
-includeBuild("examples"){
-    name = "junit-gherkin-example"
-}
+includeBuild("examples")
 rootProject.name = "junit-gherkin"
