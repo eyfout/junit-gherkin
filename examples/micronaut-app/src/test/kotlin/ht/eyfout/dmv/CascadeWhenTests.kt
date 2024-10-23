@@ -3,6 +3,9 @@ package ht.eyfout.dmv
 import ht.eyfout.example.client.dmv.DMVClient
 import ht.eyfout.dmv.http.DMVStateScopeProvider
 import ht.eyfout.example.controller.VehiclesController
+import ht.eyfout.http.openapi.generated.own.GETmanufacturersHttpEndpoint
+import ht.eyfout.http.openapi.generated.own.GETvehiclesByManufacturerHttpEndpoint
+import ht.eyfout.http.openapi.generated.own.GETvehiclesHttpEndpoint
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
@@ -34,15 +37,15 @@ class CascadeWhenTests {
                 HttpResponse.unauthorized()
             }
         }.`when`("GET vehicles using manufacturer name") {
-            it.httpRequest(VehiclesController.APIEndpoint.VehiclesByManufacturerName)
+            it.httpRequest(GETvehiclesHttpEndpoint.INSTANCE)
                 .queryParam("make", "Nissan")
                 .header("Authorization", "other")
         }.`when`("GET vehicles using manufacturer ID") {
-            it.httpRequest(VehiclesController.APIEndpoint.VehiclesByManufacturerID)
+            it.httpRequest(GETvehiclesByManufacturerHttpEndpoint.INSTANCE)
                 .header("Authorization", "other")
                 .pathParam("manufacturerID", "Nissan-#1")
         }.`when`("GET manufactures") {
-            it.httpRequest(VehiclesController.APIEndpoint.Manufacturers)
+            it.httpRequest(GETmanufacturersHttpEndpoint.INSTANCE)
                 .header("Authorization", "other")
         }.then("Http 401") {
             assertEquals(HttpStatus.UNAUTHORIZED.code, it.httpResponse().statusCode())

@@ -52,6 +52,10 @@ tasks.configureEach { task ->
         task.incremental=false
         task.dependsOn(tasks.named("openapiHttpAPI"))
     }
+    if(task.name == "kspTestKotlin"){
+        task.incremental=false
+        task.dependsOn(tasks.named("openapiHttpAPITest"))
+    }
 }
 
 test {

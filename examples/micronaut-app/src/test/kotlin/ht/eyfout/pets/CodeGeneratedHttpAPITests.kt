@@ -1,7 +1,6 @@
 package ht.eyfout.pets
 
 import ht.eyfout.example.client.pets.PetClient
-import ht.eyfout.example.controller.PetsController
 import ht.eyfout.http.openapi.generated.own.GETuserLogicHttpEndpoint
 import ht.eyfout.http.openapi.generated.warehouse.GETloginUserHttpEndpoint
 import ht.eyfout.junit.jupiter.gherkin.api.GherkinDynamicTest
