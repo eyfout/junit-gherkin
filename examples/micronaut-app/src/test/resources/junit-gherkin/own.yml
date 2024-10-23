@@ -1,0 +1,97 @@
+openapi: 3.0.1
+info:
+  title: example application
+  description: "Yes"
+paths:
+  /v1/manufacturers:
+    get:
+      operationId: manufacturers
+      responses:
+        "200":
+          description: manufacturers 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VehicleManufacturer"
+  /v1/manufacturers/{manufacturerID}/vehicles:
+    get:
+      operationId: vehiclesByManufacturer
+      parameters:
+      - name: manufacturerID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: vehiclesByManufacturer 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vehicle"
+  /v1/users/{userID}:
+    get:
+      operationId: userLogic
+      parameters:
+      - name: userID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: userLogic 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+  /v1/vehicles:
+    get:
+      operationId: vehicles
+      parameters:
+      - name: make
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: vehicles 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vehicle"
+components:
+  schemas:
+    Vehicle:
+      required:
+      - id
+      - manufacturer
+      - model
+      type: object
+      properties:
+        id:
+          type: string
+        manufacturer:
+          type: string
+        model:
+          type: string
+    VehicleManufacturer:
+      required:
+      - established
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        established:
+          type: string

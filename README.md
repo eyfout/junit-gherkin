@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/eyfout/junit-gherkin/workflows/Java%20CI/badge.svg)](https://github.com/eyfout/junit-gherkin/actions)
+
 # JUnit Gerkin
 
 JUnit Gerkin is a framework built on JUnit that allows users to write JUnit tests in the form of

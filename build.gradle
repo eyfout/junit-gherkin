@@ -1,15 +1,12 @@
-plugins{
-    id 'maven-publish'
-}
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
 subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+    }
+    plugins.apply("maven-publish")
+    publishing {
+        repositories {
+            mavenLocal()
+        }
     }
 }

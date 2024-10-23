@@ -1,8 +1,8 @@
 package ht.eyfout.example.controller
 
-import ht.eyfout.example.client.DMVClient
-import ht.eyfout.example.client.Vehicle
-import ht.eyfout.example.client.VehicleManufacturer
+import ht.eyfout.example.client.dmv.DMVClient
+import ht.eyfout.example.client.dmv.Vehicle
+import ht.eyfout.example.client.dmv.VehicleManufacturer
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
@@ -10,7 +10,6 @@ import io.micronaut.http.annotation.*
 
 @Controller("v1/")
 class VehiclesController(private val dmvClient: DMVClient) {
-
     @Get("vehicles")
     @Produces(MediaType.APPLICATION_JSON)
     suspend fun vehicles(
@@ -48,6 +47,8 @@ class VehiclesController(private val dmvClient: DMVClient) {
     suspend fun manufacturers(
         @Header("Authorization") authorization: String,
     ): HttpResponse<Collection<VehicleManufacturer>> {
+
+
         val httpResponse = dmvClient.carManufacturers(authorization)
         return when (httpResponse.code()) {
             HttpStatus.OK.code -> HttpResponse.ok(httpResponse.body())

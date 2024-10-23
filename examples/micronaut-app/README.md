@@ -7,3 +7,6 @@ that allows to get information about a vehicle and their manufacturer.
 
 see [example tests](src/test/kotlin/ht/eyfout/example).
 
+## Setup
+These examples are written as a separate project. 
+

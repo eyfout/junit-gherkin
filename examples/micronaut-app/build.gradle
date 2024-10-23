@@ -2,20 +2,17 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.25"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.9.25"
 
+
     id("com.google.devtools.ksp") version "1.9.25-1.0.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.micronaut.application") version "4.4.2"
-//    id("io.micronaut.aot") version "4.4.2"
-}
-
-version = "0.1"
-group = "ht.eyfout.example"
-
-repositories {
-    mavenCentral()
+    id("ht.eyfout.openapi.http.api") version "0.0.1-SNAPSHOT"
 }
 
 dependencies {
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi")
+    ksp("io.micronaut.openapi:micronaut-openapi")
+    ksp("io.micronaut.openapi:micronaut-openapi-annotations")
     ksp("io.micronaut:micronaut-http-validation")
     ksp("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
@@ -23,26 +20,48 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     compileOnly("io.micronaut:micronaut-http-client")
+    compileOnly("io.micronaut.openapi:micronaut-openapi-annotations")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    implementation libs.junit.gherkin
+    implementation libs.gherkin.http.api
+    implementation libs.gherkin.http
+
     testImplementation("io.micronaut:micronaut-http-client")
-    testImplementation(project(":libraries:gherkin-http-provider"))
-    testImplementation(project(":libraries:junit-gherkin"))
     testImplementation libs.mockk
     testImplementation libs.rest.assured
     testImplementation libs.jakarta.inject.api
+    testImplementation(platform("org.junit:junit-bom:5.11.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 
+    implementation project.files(project.layout.buildDirectory.file("generated/junit-gherkin/main/classes"))
+    testImplementation project.files(project.layout.buildDirectory.file("generated/junit-gherkin/test/classes"))
 }
 
-
 application {
-    mainClass = "ht.eyfout.example.ApplicationKt"
+    mainClass = "ht.eyfout.example.Application"
 }
 java {
     sourceCompatibility = JavaVersion.toVersion("18")
 }
 
+tasks.configureEach { task ->
+    if(task.name == "kspKotlin"){
+        task.incremental=false
+        task.dependsOn(tasks.named("openapiHttpAPI"))
+    }
+    if(task.name == "kspTestKotlin"){
+        task.incremental=false
+        task.dependsOn(tasks.named("openapiHttpAPITest"))
+    }
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+    }
+}
 
 graalvmNative.toolchainDetection = false
 
@@ -66,6 +85,3 @@ micronaut {
 //        replaceLogbackXml = true
 //    }
 }
-
-
-

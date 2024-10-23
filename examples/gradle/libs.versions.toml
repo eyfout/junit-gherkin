@@ -1,0 +1,28 @@
+[versions]
+jakarta-inject = "2.0.0"
+junit-jupiter = "5.8.1"
+mockk = "1.12.15"
+openapi-generator = "7.8.0"
+ow2-asm = "9.2"
+rest-assured = "5.5.0"
+junit-gherkin = "0.0.1-SNAPSHOT"
+
+
+
+[libraries]
+junit-gherkin = {module = "ht.eyfout:junit-gherkin", version.ref = "junit-gherkin"}
+gherkin-http-api = {module = "ht.eyfout:openapi-http-api-generator", version.ref = "junit-gherkin"}
+gherkin-http = {module = "ht.eyfout:http-api-provider", version.ref = "junit-gherkin"}
+
+junit-jupiter = { module = "org.junit:junit-bom", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
+
+
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
+ow2-asm = { module = "org.ow2.asm:asm", version.ref = "ow2-asm"}
+ow2-asm-util = { module = "org.ow2.asm:asm-util", version.ref = "ow2-asm"}
+
+rest-assured = { module = "io.rest-assured:rest-assured", version.ref = "rest-assured" }
+jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject" }

@@ -1,0 +1,27 @@
+plugins {
+    id("java")
+}
+
+dependencies {
+    implementation libs.junit.jupiter.api
+    implementation project(":libraries:junit-gherkin")
+    implementation libs.rest.assured
+
+    testImplementation(platform(libs.junit.jupiter))
+    testImplementation libs.junit.jupiter.engine
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+    }
+}
+
+
+publishing {
+    publications{
+        mavenJava(MavenPublication){
+            from components.java
+        }
+    }
+}

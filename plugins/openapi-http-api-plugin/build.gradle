@@ -1,0 +1,29 @@
+plugins{
+    id 'java-gradle-plugin'
+}
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation project(":libraries:openapi-http-api-generator")
+    testImplementation(platform(libs.junit.jupiter))
+    testImplementation(libs.junit.jupiter.engine)
+}
+
+gradlePlugin {
+    plugins {
+        junitGherkinHttpPlugin {
+            id = 'ht.eyfout.openapi.http.api'
+            implementationClass = 'ht.eyfout.plugins.openapi.http.api.HttpCodeGeneratorPlugin'
+        }
+    }
+}
+
+
+test {
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+    }
+}
