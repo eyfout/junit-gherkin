@@ -1,5 +1,5 @@
 pluginManagement {
-    repositories{
+    repositories {
         mavenLocal()
         gradlePluginPortal()
         mavenCentral()
@@ -12,5 +12,9 @@ buildscript {
         mavenCentral()
     }
 }
-include("micronaut-app")
-rootProject.name  = "junit-gherkin-example"
+
+if (!hasProperty("no-examples")) {
+    include("micronaut-app")
+}
+
+rootProject.name = "junit-gherkin-example"

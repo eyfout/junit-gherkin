@@ -1,17 +1,15 @@
 pluginManagement {
-    repositories{
+    repositories {
         mavenLocal()
         gradlePluginPortal()
         mavenCentral()
     }
 }
 
-
 include(":libraries:junit-gherkin")
 include(":libraries:http-api-provider")
 include(":libraries:openapi-http-api-generator")
-include(":gradle-plugin")
-
+include(":plugins:openapi-http-api-plugin")
 
 includeBuild("examples")
 rootProject.name = "junit-gherkin"
