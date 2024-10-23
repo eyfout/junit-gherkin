@@ -6,10 +6,11 @@ pluginManagement {
     }
 }
 
-include(":libraries:junit-gherkin")
-include(":libraries:http-api-provider")
-include(":libraries:openapi-http-api-generator")
-include(":plugins:openapi-http-api-plugin")
+include("bom")
+include("libraries:junit-gherkin")
+include("libraries:http-api-provider")
+include("libraries:openapi-http-api-generator")
+include("plugins:openapi-http-api-plugin")
 
 includeBuild("examples")
 rootProject.name = "junit-gherkin"

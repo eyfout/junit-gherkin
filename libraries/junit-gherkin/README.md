@@ -14,7 +14,7 @@ Stream<DynamicTest> inventory() {
 }
 ```
 ## Getting Started
-To use this library you **MUST** implement
-- [StateScopeProvider](src/main/java/ht/eyfout/junit/jupiter/api/StateScopeProvider.java)
-
-see [http api scope](../gherkin-http-provider) implementation for microservice testing.
+To use this library you **MUST** implement the
+[StateScopeProvider](src/main/java/ht/eyfout/junit/jupiter/api/StateScopeProvider.java).
+As an example see the [http api provider](../http-api-provider), which
+adds support for testing **HTTP** endpoints.

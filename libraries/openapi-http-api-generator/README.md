@@ -1,0 +1,1 @@
+see [Gradle Plugin](../../plugins/openapi-http-api-plugin) for more information.
