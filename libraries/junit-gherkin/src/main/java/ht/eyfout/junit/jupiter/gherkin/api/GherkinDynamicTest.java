@@ -13,7 +13,7 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
     }
 
     /**
-     * The given is where you setup any artifact(s) you are going to need
+     * The given is where you set up any artifact(s) you are going to need
      * to test your feature / api. It may not be preceded or repeated.
      *
      * @param label optional label
@@ -21,10 +21,36 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
      */
     FollowOn<When, Then> given(String label, Consumer<Given> given);
 
+    /**
+     * When is where you stimulate your feature / api.
+     * This scope can be repeated any number of times with duplication.
+     *
+     * @param label optional label
+     * @return {@link FollowOn} for chaining
+     */
+    default FollowOn<When, Then> when(String label, Consumer<When> when){
+        return given(null, it -> {}).when(label, when);
+    }
+
+    /**
+     * Assert your expecting without a state or criteria.
+     * @param label
+     * @param then
+     * @return
+     */
+    default Stream<DynamicTest> expect(String label, Consumer<Then> then){
+        return when(null, it -> {}).then(label, then);
+    }
+
+    /**
+     * For chaining of {@link GherkinDynamicTest} to specify {@link When} and {@link Then} criterion.
+     * @param <When> {@link FollowOn#when(String, Consumer)}
+     * @param <Then> {@link FollowOn#then(String, Consumer)}
+     */
     interface FollowOn<When extends WhenScope, Then extends ThenScope> {
 
         /**
-         * Furcate the given state into multiple {@link FollowOn} that MUST
+         * Bifurcate the given state into multiple {@link FollowOn} that MUST
          * terminate with {@link #then(String, Consumer)}.
          *
          * @param fork

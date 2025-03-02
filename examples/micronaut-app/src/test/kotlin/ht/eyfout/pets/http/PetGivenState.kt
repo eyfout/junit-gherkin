@@ -10,20 +10,19 @@ import io.mockk.every
 import java.util.function.Supplier
 
 class PetGivenState(private val client: PetClient) : HttpGivenState() {
-    override fun match(endpoint: HttpEndpoint<*>, httpRequest: HttpRequestBuilder, httpResponse: Supplier<Any>) {
+    override fun <B : HttpRequestBuilder, R : Any?> match(endpoint: HttpEndpoint<B>, httpRequest: B, httpResponse: Supplier<R>) {
         with(httpRequest) {
             when (endpoint) {
                 is GETloginUserHttpEndpoint -> {
                     every {
                         client.userLogin(
-                            queryParam(GETloginUserHttpEndpoint.QueryParam.USERNAME),
-                            queryParam(GETloginUserHttpEndpoint.QueryParam.PASSWORD)
+                            httpRequest.queryParam(GETloginUserHttpEndpoint.QueryParam.USERNAME),
+                            httpRequest.queryParam(GETloginUserHttpEndpoint.QueryParam.PASSWORD)
                         )
                     } answers {
                         httpResponse.get() as HttpResponse<String>
                     }
                 }
-
                 else -> throw IllegalArgumentException("${endpoint.basePath} not yet implemented.")
             }
         }

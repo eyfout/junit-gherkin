@@ -19,7 +19,7 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
     }
 
     @Override
-    public FollowOn<W, T> given(String label, Consumer<G> given) {
+    final public FollowOn<W, T> given(String label, Consumer<G> given) {
         G givenState = provider.givenState();
         given.accept(givenState);
         givenState.setLabel(label);
@@ -38,14 +38,14 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         }
 
         @Override
-        public Stream<DynamicTest> fork(Function<FollowOn<W, T>, Stream<DynamicTest>>... fork) {
+        final public Stream<DynamicTest> fork(Function<FollowOn<W, T>, Stream<DynamicTest>>... fork) {
             return Arrays.stream(fork).flatMap(it ->
                     it.apply(new StdFollowOn<>(provider, this.givenState.copyWith()))
             );
         }
 
         @Override
-        public FollowOn<W, T> when(String label, Consumer<W> when) {
+        final public FollowOn<W, T> when(String label, Consumer<W> when) {
             W whenScope = provider.whenScope(givenState.copyWith());
             when.accept(whenScope);
             whenScope.setLabel(label);
@@ -64,7 +64,7 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         }
 
         @Override
-        public Stream<DynamicTest> then(String label, Consumer<T> then) {
+        final public Stream<DynamicTest> then(String label, Consumer<T> then) {
             return whenScopes.stream()
                     .flatMap(whenScope -> whenScope.scopeExecutor(givenState.copyWith()).map(executor -> {
                         T thenScope = provider.thenScope(executor);
@@ -75,6 +75,4 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
 
         }
     }
-
-
 }

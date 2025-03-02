@@ -6,8 +6,8 @@ import jakarta.inject.Singleton
 
 @Singleton
 class DMVStateScopeProvider(private val client: DMVClient) :
-    HttpStateScopeProvider<ClientGivenState, HttpWhenScope, HttpThenScope>() {
-    override fun givenState(): ClientGivenState {
-        return ClientGivenState(client = client)
+    HttpStateScopeProvider<DMVClientGivenState, HttpWhenScope, HttpThenScope>() {
+    override fun givenState(): DMVClientGivenState {
+        return DMVClientGivenState(client = client)
     }
 }

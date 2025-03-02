@@ -3,6 +3,7 @@ package ht.eyfout.http.openapi.generated;
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 import ht.eyfout.http.HttpEndpoint;
 import ht.eyfout.http.HttpRequestBuilder;
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpGivenState;
 
 import javax.annotation.processing.Generated;
 import java.util.Optional;
@@ -28,7 +29,7 @@ final public class GjCGHttpEndpoint implements HttpEndpoint<GjCGHttpEndpoint.Req
     }
 
     @Override
-    public RequestBuilder<HeaderParam, PathParam, QueryParam> builder(GivenState givenState) {
+    public RequestBuilder<HeaderParam, PathParam, QueryParam> builder(HttpGivenState givenState) {
         return new RequestBuilder<>(this, givenState);
     }
 
@@ -40,7 +41,7 @@ final public class GjCGHttpEndpoint implements HttpEndpoint<GjCGHttpEndpoint.Req
     static final public class RequestBuilder<H extends HeaderParam,
             P extends PathParam,
             Q extends QueryParam> extends HttpRequestBuilder {
-        public RequestBuilder(GjCGHttpEndpoint api, GivenState givenState) {
+        public RequestBuilder(GjCGHttpEndpoint api, HttpGivenState givenState) {
             super(api, givenState);
         }
 

@@ -1,6 +1,7 @@
 package ht.eyfout.http;
 
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpGivenState;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -11,11 +12,11 @@ public class HttpRequestBuilder {
     final private Map<String, Object> headers = new HashMap<>();
     final private Map<String, Object> queryParams = new HashMap<>();
     final private Map<String, Object> pathParams = new HashMap<>();
-    final private Optional<GivenState> givenState;
+    final private Optional<HttpGivenState> givenState;
     private Optional<Object> body = Optional.empty();
     private final List<Consumer<HttpRequestBuilder>> requiredChecks = new ArrayList<>();
 
-    public HttpRequestBuilder(HttpEndpoint<? extends HttpRequestBuilder> api, GivenState givenState) {
+    public HttpRequestBuilder(HttpEndpoint<? extends HttpRequestBuilder> api, HttpGivenState givenState) {
         this.api = api;
         this.givenState = Optional.ofNullable(givenState);
     }

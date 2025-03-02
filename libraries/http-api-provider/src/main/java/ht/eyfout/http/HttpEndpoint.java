@@ -1,6 +1,7 @@
 package ht.eyfout.http;
 
 import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
+import ht.eyfout.junit.jupiter.gherkin.api.http.HttpGivenState;
 
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ public interface HttpEndpoint<B extends HttpRequestBuilder> {
     }
 
     @SuppressWarnings("unchecked")
-    default B builder(GivenState givenState) {
+    default B builder(HttpGivenState givenState) {
         return (B) new HttpRequestBuilder(this, givenState);
     }
 

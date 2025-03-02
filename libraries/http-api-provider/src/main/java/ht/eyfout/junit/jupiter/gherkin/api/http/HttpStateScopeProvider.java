@@ -6,6 +6,7 @@ import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 import ht.eyfout.junit.jupiter.gherkin.api.StateScopeProvider;
 import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 public abstract class HttpStateScopeProvider<Given extends GivenState, When extends HttpWhenScope, Then extends HttpThenScope> implements StateScopeProvider<Given, When, Then> {
@@ -17,9 +18,15 @@ public abstract class HttpStateScopeProvider<Given extends GivenState, When exte
     public Given givenState() {
         return (Given) new HttpGivenState(){
 
+
             @Override
-            protected void match(HttpEndpoint<?> endpoint, HttpRequestBuilder request, Supplier<Object> response) {
-                throw new IllegalStateException("Not implemented.");
+            protected <B extends HttpRequestBuilder, R> void match(HttpEndpoint<B> endpoint, B request, Supplier<R> response) {
+                throw new IllegalStateException(this.getClass().getName() + "#match does not support" + endpoint);
+            }
+
+            @Override
+            public Map<String, Object> asMap() {
+                return Map.of();
             }
         };
     }

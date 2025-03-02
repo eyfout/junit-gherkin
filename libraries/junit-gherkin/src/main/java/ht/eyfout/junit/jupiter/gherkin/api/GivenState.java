@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Precondition, used to describe the original context.
+ * Specialized implementation MUST override the following:
+ * {@link #copy()}
+ */
 public class GivenState implements MutableScope {
     private final Map<Object, Object> miscellaneous;
 
@@ -19,6 +24,9 @@ public class GivenState implements MutableScope {
         miscellaneous.put(GivenState.class, label);
     }
 
+    /**
+     * Creates an exact copy of this {@link GivenState} instance.
+     */
      GivenState copy(){
         return new GivenState();
      }
@@ -29,8 +37,4 @@ public class GivenState implements MutableScope {
         other.miscellaneous.putAll(miscellaneous);
         return (G) other;
     }
-
-     public Map<String, Object> asMap(){
-        return new HashMap<>();
-     }
 }

@@ -7,6 +7,7 @@ dependencies {
     constraints {
         project(":libraries").subprojects.forEach {
             api(project(it.path))
+            println("\t - including ${it.name} in the BOM.")
         }
     }
 }
