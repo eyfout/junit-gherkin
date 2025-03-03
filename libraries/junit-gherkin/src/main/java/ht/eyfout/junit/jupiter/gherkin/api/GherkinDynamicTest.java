@@ -13,22 +13,18 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
     }
 
     /**
-     * The given is where you set up any artifact(s) you are going to need
-     * to test your feature / api. It may not be preceded or repeated.
-     *
+     * @see GivenState
      * @param label optional label
      * @return {@link FollowOn} for chaining
      */
-    FollowOn<When, Then> given(String label, Consumer<Given> given);
+    FollowOn<Given, When, Then> given(String label, Consumer<Given> given);
 
     /**
-     * When is where you stimulate your feature / api.
-     * This scope can be repeated any number of times with duplication.
-     *
+     * @see WhenScope
      * @param label optional label
      * @return {@link FollowOn} for chaining
      */
-    default FollowOn<When, Then> when(String label, Consumer<When> when){
+    default FollowOn<Given, When, Then> when(String label, Consumer<When> when){
         return given(null, it -> {}).when(label, when);
     }
 
@@ -47,7 +43,7 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
      * @param <When> {@link FollowOn#when(String, Consumer)}
      * @param <Then> {@link FollowOn#then(String, Consumer)}
      */
-    interface FollowOn<When extends WhenScope, Then extends ThenScope> {
+    interface FollowOn<Given extends GivenState, When extends WhenScope, Then extends ThenScope> {
 
         /**
          * Bifurcate the given state into multiple {@link FollowOn} that MUST
@@ -56,21 +52,26 @@ public interface GherkinDynamicTest<Given extends GivenState, When extends WhenS
          * @param fork
          * @return {@link }
          */
-        Stream<DynamicTest> fork(Function<FollowOn<When, Then>, Stream<DynamicTest>>... fork);
+        Stream<DynamicTest> fork(Function<FollowOn<Given, When, Then>, Stream<DynamicTest>>... fork);
 
         /**
-         * When is where you stimulate your feature / api.
-         * This scope can be repeated any number of times with duplication.
-         *
+         * @see WhenScope
          * @param label optional label
          * @return {@link FollowOn} for chaining
          */
-        FollowOn<When, Then> when(String label, Consumer<When> when);
+        FollowOn<Given, When, Then> when(String label, Consumer<When> when);
+
 
         /**
-         * Then is where you verify the expected outcome.
-         * This is a terminal operation. No other operation may follow.
-         *
+         * Continue {@link GivenState}.
+         * @param label
+         * @param when
+         * @return
+         */
+        FollowOn<Given, When, Then> and(String label, Consumer<Given> when);
+
+        /**
+         * @see ThenScope
          * @param label
          * @return {@link Stream} of {@link DynamicTest}.
          */

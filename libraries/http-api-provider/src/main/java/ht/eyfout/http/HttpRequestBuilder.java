@@ -1,6 +1,5 @@
 package ht.eyfout.http;
 
-import ht.eyfout.junit.jupiter.gherkin.api.GivenState;
 import ht.eyfout.junit.jupiter.gherkin.api.http.HttpGivenState;
 
 import java.util.*;

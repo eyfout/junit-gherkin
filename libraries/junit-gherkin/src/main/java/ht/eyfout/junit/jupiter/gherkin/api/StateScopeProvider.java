@@ -8,11 +8,21 @@ package ht.eyfout.junit.jupiter.gherkin.api;
  */
 public interface StateScopeProvider<Given extends GivenState, When extends WhenScope, Then extends ThenScope> {
     /**
-     * Initial state
+     * Initial state, see {@link GivenState}.
      */
     Given givenState();
 
+    /**
+     * see {@link WhenScope}
+     * @param givenState
+     * @return
+     */
     When whenScope(Given givenState);
 
+    /**
+     * see {@link ThenScope}
+     * @param executor
+     * @return
+     */
     Then thenScope(WhenScopeExecutor executor);
 }

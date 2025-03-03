@@ -19,14 +19,14 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
     }
 
     @Override
-    final public FollowOn<W, T> given(String label, Consumer<G> given) {
+    final public FollowOn<G, W, T> given(String label, Consumer<G> given) {
         G givenState = provider.givenState();
         given.accept(givenState);
         givenState.setLabel(label);
         return new StdFollowOn<>(provider, givenState);
     }
 
-    static class StdFollowOn<G extends GivenState, W extends WhenScope, T extends ThenScope> implements FollowOn<W, T> {
+    static class StdFollowOn<G extends GivenState, W extends WhenScope, T extends ThenScope> implements FollowOn<G, W, T> {
         private final StateScopeProvider<G, W, T> provider;
         private final G givenState;
         private final List<W> whenScopes = new ArrayList<>();
@@ -38,18 +38,35 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
         }
 
         @Override
-        final public Stream<DynamicTest> fork(Function<FollowOn<W, T>, Stream<DynamicTest>>... fork) {
+        final public Stream<DynamicTest> fork(Function<FollowOn<G, W, T>, Stream<DynamicTest>>... fork) {
             return Arrays.stream(fork).flatMap(it ->
                     it.apply(new StdFollowOn<>(provider, this.givenState.copyWith()))
             );
         }
 
         @Override
-        final public FollowOn<W, T> when(String label, Consumer<W> when) {
+        final public FollowOn<G, W, T> when(String label, Consumer<W> when) {
             W whenScope = provider.whenScope(givenState.copyWith());
             when.accept(whenScope);
             whenScope.setLabel(label);
             whenScopes.add(whenScope);
+            return this;
+        }
+
+        @Override
+        public FollowOn<G, W, T> and(String label, Consumer<G> given) {
+            if(whenScopes.isEmpty()){
+                given.accept(givenState);
+                if(null != label) {
+                    if(givenState.getLabel().isPresent()){
+                        givenState.setLabel(givenState.getLabel().get() + " AND " + label);
+                    } else {
+                        givenState.setLabel(label);
+                    }
+                }
+            } else {
+                throw new IllegalStateException("and can only be applied immediately after a given.");
+            }
             return this;
         }
 

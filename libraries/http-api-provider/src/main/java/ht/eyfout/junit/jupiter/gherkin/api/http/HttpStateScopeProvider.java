@@ -17,16 +17,9 @@ public abstract class HttpStateScopeProvider<Given extends GivenState, When exte
     @Override
     public Given givenState() {
         return (Given) new HttpGivenState(){
-
-
             @Override
             protected <B extends HttpRequestBuilder, R> void match(HttpEndpoint<B> endpoint, B request, Supplier<R> response) {
                 throw new IllegalStateException(this.getClass().getName() + "#match does not support" + endpoint);
-            }
-
-            @Override
-            public Map<String, Object> asMap() {
-                return Map.of();
             }
         };
     }
