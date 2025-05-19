@@ -111,7 +111,7 @@ class HttpParamClassVisitor extends ClassVisitor {
 
             MethodVisitor mv = cv.visitMethod(Opcodes.ACC_PUBLIC,
                     "set" + OpenAPIHttpEndpointGenerator.camelCase(it.getName()),
-                    Type.getMethodDescriptor(Type.getType(void.class), Type.getType(paramType)),
+                    Type.getMethodDescriptor(Type.getObjectType(className), Type.getType(paramType)),
                     null,
                     null);
             mv.visitCode();
@@ -124,7 +124,10 @@ class HttpParamClassVisitor extends ClassVisitor {
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner.getInternalName(),
                     aliasForIn.get(it.getIn().toLowerCase()),
                     descriptor, false);
-            mv.visitInsn(Opcodes.RETURN);
+
+            mv.visitVarInsn(Opcodes.ALOAD, 0);
+            mv.visitInsn(Opcodes.ARETURN);
+
             mv.visitMaxs(2, 2);
             mv.visitEnd();
         });

@@ -78,6 +78,11 @@ final public class GjCGHttpEndpoint implements HttpEndpoint<GjCGHttpEndpoint.Req
         public void requiredParams(HttpRequestBuilder builder) {
 
         }
+
+        public HeaderParam set(String key, Object value){
+            builder.header(key, value);
+            return this;
+        }
     }
 
     @Generated("junit-gherkin")
@@ -91,6 +96,11 @@ final public class GjCGHttpEndpoint implements HttpEndpoint<GjCGHttpEndpoint.Req
 
         @Override
         public void requiredParams(HttpRequestBuilder builder) {
+        }
+
+        public QueryParam set(String key, Object value){
+            builder.queryParam(key, value);
+            return this;
         }
     }
 
@@ -106,6 +116,11 @@ final public class GjCGHttpEndpoint implements HttpEndpoint<GjCGHttpEndpoint.Req
         @Override
         public void requiredParams(HttpRequestBuilder builder) {
 
+        }
+
+        public PathParam set(String key, Object value){
+            builder.pathParam(key, value);
+            return this;
         }
     }
 }

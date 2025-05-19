@@ -28,7 +28,7 @@ class CodeGeneratedHttpAPITests {
             given.httpRequest(GETloginUserHttpEndpoint.INSTANCE, { httpRequest ->
                 httpRequest.queryParams({
                     it.setPassword("password")
-                    it.setUsername("eyfout")
+                    .setUsername("eyfout")
                 })
             }).respondsWith {
                 HttpResponse.ok("{name:eyfout, org:junit-gherkin}")

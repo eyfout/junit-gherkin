@@ -38,9 +38,11 @@ class DMVClientGivenState(
         return DMVClientGivenState(state.toMutableMap(), client)
     }
 
-    override fun <B : HttpRequestBuilder?, R : Any?> match(p0: HttpEndpoint<B>?, p1: B, p2: Supplier<R>?) {
-        when(p0){
-            else -> throw IllegalStateException(javaClass.name + "#match does not support" + p1)
+    override fun <B : HttpRequestBuilder?, R : Any?> match(endpoint: HttpEndpoint<B>?,
+                                                           httpRequest: B,
+                                                           httpResponse: Supplier<R>?) {
+        when(endpoint){
+            else -> throw IllegalStateException(javaClass.name + "#match does not support" + httpRequest)
         }
     }
 

@@ -7,6 +7,7 @@ import ht.eyfout.junit.jupiter.gherkin.api.WhenScope;
 import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,6 +17,11 @@ public class HttpWhenScope extends WhenScope {
 
     public HttpWhenScope(GivenState givenState) {
         this.givenState = givenState;
+    }
+
+
+    final public <B extends HttpRequestBuilder> void httpRequest(HttpEndpoint<B> api, Consumer<B> consumer) {
+        consumer.accept(httpRequest(api));
     }
 
     final public <B extends HttpRequestBuilder> B httpRequest(HttpEndpoint<B>... api) {
