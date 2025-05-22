@@ -25,17 +25,18 @@ class CodeGeneratedHttpAPITests {
     @TestFactory
     fun user() = GherkinDynamicTest.dynamicTest(provider)
         .given("eyfout profile") { given ->
-            given.httpRequest(GETloginUserHttpEndpoint.INSTANCE, { httpRequest ->
-                httpRequest.queryParams({
+            given.httpRequest(GETloginUserHttpEndpoint.INSTANCE) { httpRequest ->
+                httpRequest.queryParams {
                     it.setPassword("password")
-                    .setUsername("eyfout")
-                })
-            }).respondsWith {
+                        .setUsername("eyfout")
+                }
+            }.respondsWith {
                 HttpResponse.ok("{name:eyfout, org:junit-gherkin}")
             }
         }.`when`("request info for eyfout") {
-            it.httpRequest(GETuserLogicHttpEndpoint.INSTANCE)
-                .pathParam("userID", "eyfout")
+            it.httpRequest(GETuserLogicHttpEndpoint.INSTANCE) { httpRequest ->
+                httpRequest.pathParam("userID", "eyfout")
+            }
         }.then("org information") {
             assertEquals("{name:eyfout, org:junit-gherkin}", it.httpResponse().body.asString())
         }

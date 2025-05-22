@@ -25,4 +25,12 @@ public interface StateScopeProvider<Given extends GivenState, When extends WhenS
      * @return
      */
     Then thenScope(WhenScopeExecutor executor);
+
+    /**
+     * Generates dynamic test name.
+     * @return {@link DisplayNameGenerator}.
+     */
+    default DisplayNameGenerator displayName() {
+        return new DisplayNameGenerator();
+    }
 }

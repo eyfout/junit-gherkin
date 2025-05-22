@@ -44,7 +44,7 @@ public class HttpWhenScope extends WhenScope {
     private record Executor(HttpEndpoint<?> api,
                             HttpRequestBuilder builder) implements WhenScopeExecutor {
         @Override
-        public Optional<String> displayName() {
+        public Optional<String> getLabel() {
             StringBuilder sb = new StringBuilder();
 
             api.getDescription().ifPresent(it -> {

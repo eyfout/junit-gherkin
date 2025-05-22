@@ -1,5 +1,6 @@
 package ht.eyfout.http;
 
+import ht.eyfout.junit.jupiter.gherkin.api.WhenScopeExecutor;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
@@ -7,7 +8,7 @@ import io.restassured.specification.RequestSpecification;
 
 import java.net.ConnectException;
 
-public class HttpRequestExecutor {
+public class HttpRequestExecutor implements WhenScopeExecutor {
     private final HttpEndpoint<?> api;
     private final HttpRequestBuilder builder;
     private Response httpResponse;
@@ -27,7 +28,7 @@ public class HttpRequestExecutor {
         return spec;
     }
 
-    //    @Override
+    @Override
     @SuppressWarnings("unchecked")
     public <R> R exec() {
         if (httpResponse == null) {

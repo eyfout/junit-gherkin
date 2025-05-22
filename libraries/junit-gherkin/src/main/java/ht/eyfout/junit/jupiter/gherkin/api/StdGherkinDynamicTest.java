@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DynamicTest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -70,23 +69,17 @@ final class StdGherkinDynamicTest<G extends GivenState, W extends WhenScope, T e
             return this;
         }
 
-        private String displayName(WhenScope whenScope, String thenLabel, Optional<String> addOn) {
-            StringBuilder sb = new StringBuilder();
-            String delimiter = " | ";
-            givenState.getLabel().ifPresent(it -> sb.append("Given: ").append(it).append(delimiter));
-            whenScope.getLabel().ifPresent(it -> sb.append("When: ").append(it).append(delimiter));
-            Optional.ofNullable(thenLabel).ifPresent(it -> sb.append("Then: ").append(it).append(delimiter));
-            addOn.ifPresent(it -> sb.append(" => ").append(it));
-            return sb.toString();
-        }
-
         @Override
         final public Stream<DynamicTest> then(String label, Consumer<T> then) {
             return whenScopes.stream()
                     .flatMap(whenScope -> whenScope.scopeExecutor(givenState.copyWith()).map(executor -> {
                         T thenScope = provider.thenScope(executor);
+                        DisplayNameGenerator displayName = provider.displayName();
+                        givenState.getLabel().ifPresent(displayName::given);
+                        whenScope.getLabel().ifPresent(displayName::when);
+                        executor.getLabel().ifPresent(displayName::whenExecutor);
                         return DynamicTest.dynamicTest(
-                                displayName(whenScope, label, executor.displayName()),
+                                displayName.then(label).build(),
                                 () -> then.accept(thenScope));
                     }));
 
